@@ -2,9 +2,17 @@ class_name Player
 extends Area2D
 
 const MUZZLE_FLASH_SCENE := preload("res://effects/muzzle_flash.tscn")
+const BOMB_SCENE := preload("res://player/bomb.tscn")
+const MAX_SHOT_ROWS := 5
+const MAX_DIAGONAL_LEVEL := 3
+const MAX_BOMB_LEVEL := 3
+const DIAGONAL_STEP_DEGREES := 14.0
+const BOMB_BASE_INTERVAL := 0.7
+const UPGRADE_NAMES := {"row": "EXTRA ROW OF SHOT", "diagonal": "DIAGONAL SHOT", "bomb": "CARPET BOMBS"}
 
-signal super_charge_changed(charge: int)
 signal god_mode_changed(active: bool)
+signal health_changed(current: int, maximum: int)
+signal super_progress_changed(progress: float)
 
 @export var speed: float = 700.0
 @export var max_health: int = 8
@@ -44,6 +52,10 @@ var nova_bullets_remaining: int = 0
 var nova_bullets_spawned: int = 0
 var nova_damage: int = 0
 var invincible_time: float = 0.0
+var shot_rows: int = 2
+var diagonal_level: int = 0
+var bomb_level: int = 0
+var bomb_timer: float = 0.0
 
 func _ready() -> void:
 	health = max_health
@@ -65,6 +77,7 @@ func _physics_process(delta: float) -> void:
 	_handle_inhale(delta)
 	_handle_charge_pulse(delta)
 	_update_invincibility(delta)
+	_update_bombing(delta)
 
 	if nova_active:
 		nova_elapsed += delta
@@ -128,6 +141,9 @@ func _release_all_pulled() -> void:
 			node.set("being_inhaled", false)
 
 func _swallow(target: Node2D) -> void:
+	if target.has_method("collect"):
+		target.collect(self)
+		return
 	var amount := charge_per_swallow
 	if "charge_amount" in target:
 		amount = target.get("charge_amount")
@@ -136,16 +152,16 @@ func _swallow(target: Node2D) -> void:
 
 func grant_super_charge(amount: float) -> void:
 	super_progress = min(super_progress + amount, float(super_max_charge))
+	super_progress_changed.emit(super_progress)
 	var new_charge := int(floor(super_progress))
 	if new_charge != super_charge:
 		super_charge = new_charge
-		super_charge_changed.emit(super_charge)
 
 func _unleash_super() -> void:
 	var level := super_charge
 	super_charge = 0
 	super_progress = 0.0
-	super_charge_changed.emit(super_charge)
+	super_progress_changed.emit(super_progress)
 
 	var radius := super_base_radius + float(level - 1) * super_radius_step
 	var damage := super_damage_per_charge * level
@@ -170,6 +186,8 @@ func _clear_nearby(radius: float, damage: int) -> void:
 			continue
 		if target.has_method("take_damage"):
 			target.take_damage(damage)
+		elif target.has_method("collect"):
+			target.collect(self)
 		elif "charge_amount" in target:
 			var amount: float = target.get("charge_amount")
 			target.queue_free()
@@ -223,11 +241,64 @@ func _fire() -> void:
 
 	_spawn_muzzle_flash()
 
-	for row_offset in [-bullet_row_spacing / 2.0, bullet_row_spacing / 2.0]:
-		var bullet := bullet_scene.instantiate() as Bullet
-		get_parent().add_child(bullet)
-		bullet.global_position = global_position + Vector2(45, row_offset)
-		bullet.direction = Vector2.RIGHT
+	for i in shot_rows:
+		var row_offset := (float(i) - float(shot_rows - 1) / 2.0) * bullet_row_spacing
+		_spawn_shot(Vector2(45, row_offset), Vector2.RIGHT)
+
+	for level in range(1, diagonal_level + 1):
+		var angle := deg_to_rad(DIAGONAL_STEP_DEGREES * level)
+		_spawn_shot(Vector2(45, 0), Vector2.RIGHT.rotated(-angle))
+		_spawn_shot(Vector2(45, 0), Vector2.RIGHT.rotated(angle))
+
+func _spawn_shot(offset: Vector2, direction: Vector2) -> void:
+	var bullet := bullet_scene.instantiate() as Bullet
+	get_parent().add_child(bullet)
+	bullet.global_position = global_position + offset
+	bullet.direction = direction
+
+func _update_bombing(delta: float) -> void:
+	if bomb_level <= 0:
+		return
+	bomb_timer -= delta
+	if bomb_timer > 0.0:
+		return
+	bomb_timer = BOMB_BASE_INTERVAL / float(bomb_level)
+	var bomb := BOMB_SCENE.instantiate() as Node2D
+	get_parent().add_child(bomb)
+	bomb.global_position = global_position + Vector2(-45, 15)
+
+func can_upgrade(id: String) -> bool:
+	match id:
+		"row":
+			return shot_rows < MAX_SHOT_ROWS
+		"diagonal":
+			return diagonal_level < MAX_DIAGONAL_LEVEL
+		"bomb":
+			return bomb_level < MAX_BOMB_LEVEL
+	return false
+
+func roll_upgrade_offers(count: int) -> Array[String]:
+	var options: Array[String] = []
+	for id in UPGRADE_NAMES:
+		if can_upgrade(id):
+			options.append(id)
+	options.shuffle()
+	var offers: Array[String] = []
+	for i in min(count, options.size()):
+		offers.append(options[i])
+	return offers
+
+func apply_upgrade(id: String) -> String:
+	if not can_upgrade(id):
+		return ""
+	match id:
+		"row":
+			shot_rows += 1
+		"diagonal":
+			diagonal_level += 1
+		"bomb":
+			bomb_level += 1
+	return UPGRADE_NAMES[id]
 
 func _spawn_muzzle_flash() -> void:
 	var flash := MUZZLE_FLASH_SCENE.instantiate() as Node2D
@@ -242,7 +313,12 @@ func take_damage(amount: int) -> void:
 		Game.player_died()
 		queue_free()
 		return
+	health_changed.emit(health, max_health)
 	invincible_time = invincibility_duration
+
+func heal(amount: int) -> void:
+	health = min(health + amount, max_health)
+	health_changed.emit(health, max_health)
 
 func _update_invincibility(delta: float) -> void:
 	if invincible_time <= 0.0:

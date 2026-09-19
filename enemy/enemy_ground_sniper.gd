@@ -2,8 +2,6 @@ extends Area2D
 
 const EXPLOSION_SCENE := preload("res://effects/explosion.tscn")
 const SMOKE_SCENE := preload("res://effects/smoke.tscn")
-const CHARGE_PICKUP_SCENE := preload("res://pickup/charge_pickup.tscn")
-const JEWEL_SCENE := preload("res://pickup/jewel.tscn")
 const HIT_FLASH_DURATION := 0.15
 const FLASH_COLOR := Color(1, 0.15, 0.15, 1)
 
@@ -30,6 +28,7 @@ var dead: bool = false
 
 func _ready() -> void:
 	add_to_group("enemies")
+	add_to_group("ground_enemies")
 	stop_x = randf_range(stop_x_min, stop_x_max)
 	fire_timer.wait_time = fire_interval
 	max_health = health
@@ -97,9 +96,7 @@ func _die() -> void:
 	Game.add_score(score_value)
 	_spawn_explosion()
 	_spawn_smoke()
-	_spawn_charge_pickup()
-	if randf() < jewel_drop_chance:
-		_spawn_jewel()
+	Drops.enemy_drops(get_parent(), global_position, jewel_drop_chance)
 	queue_free()
 
 func _spawn_explosion() -> void:
@@ -111,13 +108,3 @@ func _spawn_smoke() -> void:
 	var smoke := SMOKE_SCENE.instantiate() as Node2D
 	smoke.global_position = global_position
 	get_parent().add_child(smoke)
-
-func _spawn_charge_pickup() -> void:
-	var pickup := CHARGE_PICKUP_SCENE.instantiate() as Node2D
-	pickup.global_position = global_position
-	get_parent().call_deferred("add_child", pickup)
-
-func _spawn_jewel() -> void:
-	var jewel := JEWEL_SCENE.instantiate() as Node2D
-	jewel.global_position = global_position
-	get_parent().call_deferred("add_child", jewel)

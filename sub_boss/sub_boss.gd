@@ -4,8 +4,6 @@ extends Area2D
 signal health_changed(current: int, max_health: int)
 signal defeated
 
-const CHARGE_PICKUP_SCENE := preload("res://pickup/charge_pickup.tscn")
-
 enum Attack { HOMING_CONE, HORIZONTAL_LINE, SURROUND_STREAM }
 
 @export var approach_speed: float = 220.0
@@ -31,6 +29,8 @@ enum Attack { HOMING_CONE, HORIZONTAL_LINE, SURROUND_STREAM }
 @export var flash_color: Color = Color(1, 0.15, 0.15, 1)
 @export var charge_pickup_count: int = 5
 @export var charge_pickup_spread: float = 420.0
+@export var coin_drop_count: int = 10
+@export var heart_drop_count: int = 2
 
 @onready var attack_cooldown: Timer = $AttackCooldown
 @onready var visual: Polygon2D = $Visual
@@ -92,16 +92,17 @@ func take_damage(amount: int) -> void:
 	health_changed.emit(max(health, 0), max_health)
 	if health <= 0:
 		Game.add_score(score_value)
-		_spawn_charge_pickups()
+		_spawn_drops()
 		defeated.emit()
 		queue_free()
 
-func _spawn_charge_pickups() -> void:
+func _spawn_drops() -> void:
 	for i in charge_pickup_count:
-		var pickup := CHARGE_PICKUP_SCENE.instantiate() as Node2D
-		var offset := Vector2(randf_range(-charge_pickup_spread, charge_pickup_spread), randf_range(-charge_pickup_spread, charge_pickup_spread))
-		pickup.global_position = global_position + offset
-		get_parent().call_deferred("add_child", pickup)
+		Drops.spawn_at(get_parent(), global_position, Drops.CHARGE_PICKUP_SCENE, charge_pickup_spread)
+	for i in coin_drop_count:
+		Drops.spawn_at(get_parent(), global_position, Drops.COIN_SCENE, charge_pickup_spread)
+	for i in heart_drop_count:
+		Drops.spawn_heart(get_parent(), global_position, charge_pickup_spread)
 
 func _on_attack_cooldown_timeout() -> void:
 	active_attack = next_attack
