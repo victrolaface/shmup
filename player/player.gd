@@ -19,8 +19,8 @@ signal god_mode_changed(active: bool)
 @export var super_damage_per_charge: int = 4
 @export var super_bullet_count: int = 500
 @export var super_bullets_per_tick: int = 50
-@export var super_bullet_speed: float = 1450.0
-@export var super_expand_duration: float = 0.7
+@export var super_bullet_speed: float = 1000.0
+@export var super_expand_duration: float = 1.0
 @export var single_target_turn_rate: float = 20.0
 @export var invincibility_duration: float = 1.2
 @export var invincibility_blink_rate: float = 24.0
@@ -186,9 +186,9 @@ func _fire_nova_tick() -> void:
 		var angle := (float(index) / super_bullet_count) * TAU
 		var bullet := bullet_scene.instantiate() as Bullet
 		get_parent().add_child(bullet)
-		bullet.global_position = global_position
 		bullet.direction = Vector2.RIGHT.rotated(angle)
 		bullet.speed = super_bullet_speed
+		bullet.global_position = global_position + bullet.direction * super_bullet_speed * nova_elapsed
 		bullet.damage = nova_damage
 		bullet.homing_delay = max(super_expand_duration - nova_elapsed, 0.0)
 		bullet.acquire_nearest_enemy = true

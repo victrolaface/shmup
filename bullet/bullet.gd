@@ -39,6 +39,9 @@ func _physics_process(delta: float) -> void:
 
 	position += direction * speed * delta
 
+	if homing_delay > 0.0:
+		return
+
 	if global_position.x < -OFFSCREEN_MARGIN or global_position.x > WORLD_WIDTH + OFFSCREEN_MARGIN \
 			or global_position.y < -OFFSCREEN_MARGIN or global_position.y > WORLD_HEIGHT + OFFSCREEN_MARGIN:
 		queue_free()
