@@ -35,8 +35,9 @@ func _explode() -> void:
 		var target := node as Node2D
 		if target == null or not is_instance_valid(target) or target.is_queued_for_deletion():
 			continue
-		if global_position.distance_to(target.global_position) <= blast_radius and target.has_method("take_damage"):
-			target.take_damage(damage if target.is_in_group("ground_enemies") else air_damage)
+		var health := HealthComponent.find(target)
+		if health != null and global_position.distance_to(target.global_position) <= blast_radius:
+			health.take_damage(damage if target.is_in_group("ground_enemies") else air_damage)
 
 	var explosion := EXPLOSION_SCENE.instantiate() as Node2D
 	explosion.set("min_radius", blast_radius * 0.6)

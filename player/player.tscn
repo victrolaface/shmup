@@ -1,6 +1,14 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://player/player.gd" id="1"]
+[ext_resource type="Script" path="res://components/health_component.gd" id="2"]
+[ext_resource type="Script" path="res://components/invincibility_blink_component.gd" id="3"]
+[ext_resource type="Script" path="res://components/player_move_component.gd" id="4"]
+[ext_resource type="Script" path="res://components/weapon_component.gd" id="5"]
+[ext_resource type="Script" path="res://components/bomb_component.gd" id="6"]
+[ext_resource type="Script" path="res://components/super_component.gd" id="7"]
+[ext_resource type="Script" path="res://components/inhale_component.gd" id="8"]
+[ext_resource type="Script" path="res://components/upgrade_component.gd" id="9"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 24.0
@@ -22,8 +30,28 @@ shape = SubResource("CircleShape2D_1")
 [node name="InhaleIndicator" type="Polygon2D" parent="."]
 z_index = -1
 
-[node name="FireCooldown" type="Timer" parent="."]
-wait_time = 0.12
-one_shot = true
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("2")
+max_health = 8
+invincibility_duration = 1.2
 
-[connection signal="timeout" from="FireCooldown" to="." method="_on_fire_cooldown_timeout"]
+[node name="InvincibilityBlinkComponent" type="Node" parent="."]
+script = ExtResource("3")
+
+[node name="PlayerMoveComponent" type="Node" parent="."]
+script = ExtResource("4")
+
+[node name="WeaponComponent" type="Node" parent="."]
+script = ExtResource("5")
+
+[node name="BombComponent" type="Node" parent="."]
+script = ExtResource("6")
+
+[node name="SuperComponent" type="Node" parent="."]
+script = ExtResource("7")
+
+[node name="InhaleComponent" type="Node" parent="."]
+script = ExtResource("8")
+
+[node name="UpgradeComponent" type="Node" parent="."]
+script = ExtResource("9")

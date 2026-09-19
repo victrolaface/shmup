@@ -6,38 +6,41 @@
 [ext_resource type="Script" path="res://components/drop_component.gd" id="4"]
 [ext_resource type="Script" path="res://components/contact_damage_component.gd" id="5"]
 [ext_resource type="Script" path="res://components/offscreen_cull_component.gd" id="6"]
-[ext_resource type="Script" path="res://components/wave_move_component.gd" id="7"]
+[ext_resource type="Script" path="res://components/approach_stop_component.gd" id="7"]
 [ext_resource type="Script" path="res://components/shooter_component.gd" id="8"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
-radius = 22.0
+radius = 40.0
 
-[node name="EnemySineHeavy" type="Area2D" groups=["enemies"]]
+[node name="EnemyMedium" type="Area2D" groups=["enemies"]]
 collision_layer = 2
 collision_mask = 1
 monitoring = true
 monitorable = true
 
 [node name="Visual" type="Polygon2D" parent="."]
-color = Color(0.9, 0.3, 0.3, 1)
-polygon = PackedVector2Array(-24, 0, 16, -18, 24, 0, 16, 18)
+color = Color(0.2, 0.7, 0.8, 1)
+polygon = PackedVector2Array(-44, 0, -20, -34, 24, -40, 46, -14, 46, 14, 24, 40, -20, 34)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_1")
 
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("1")
-max_health = 4
+max_health = 20
 
 [node name="HitFlashComponent" type="Node" parent="."]
 script = ExtResource("2")
 
 [node name="DeathEffectsComponent" type="Node" parent="."]
 script = ExtResource("3")
-score_value = 15
+score_value = 40
 
 [node name="DropComponent" type="Node" parent="."]
 script = ExtResource("4")
+charge_count = 2
+coin_count = 3
+jewel_chance = 0.5
 
 [node name="ContactDamageComponent" type="Node" parent="."]
 script = ExtResource("5")
@@ -45,11 +48,25 @@ script = ExtResource("5")
 [node name="OffscreenCullComponent" type="Node" parent="."]
 script = ExtResource("6")
 
-[node name="WaveMoveComponent" type="Node" parent="."]
+[node name="ApproachStopComponent" type="Node" parent="."]
 script = ExtResource("7")
-speed = 260.0
-amplitude = 216.0
-frequency = 1.0
+approach_speed = 220.0
+stop_x_min = 1500.0
+stop_x_max = 2000.0
+hover_amplitude = 140.0
+hover_frequency = 0.7
+stay_duration = 14.0
 
 [node name="ShooterComponent" type="Node" parent="."]
 script = ExtResource("8")
+mode = 3
+bullet_speed = 520.0
+interval = 0.09
+autostart = false
+start_on_screen = true
+burst_count = 14
+burst_pause = 1.4
+wave_amplitude = 100.0
+wave_frequency = 5.0
+
+[connection signal="leaving" from="ApproachStopComponent" to="ShooterComponent" method="stop"]

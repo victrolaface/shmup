@@ -1,32 +1,32 @@
-[gd_scene load_steps=6 format=3 uid="uid://dyewen10oyxrt"]
+[gd_scene format=3 uid="uid://dyewen10oyxrt"]
 
-[ext_resource type="Script" path="res://main.gd" id="1"]
+[ext_resource type="Script" uid="uid://2alc0w1tyele" path="res://main.gd" id="1"]
 [ext_resource type="PackedScene" path="res://player/player.tscn" id="2"]
-[ext_resource type="Script" path="res://spawner/spawner.gd" id="3"]
-[ext_resource type="Script" path="res://spawner/formation_spawner.gd" id="4"]
-[ext_resource type="Script" path="res://spawner/ground_spawner.gd" id="5"]
-[ext_resource type="Script" path="res://pause_controller.gd" id="6"]
+[ext_resource type="Script" uid="uid://bd4qs0l3oy7et" path="res://spawner/spawner.gd" id="3"]
+[ext_resource type="Script" uid="uid://cg1ou5pudofmg" path="res://spawner/formation_spawner.gd" id="4"]
+[ext_resource type="Script" uid="uid://cscfan1k1awqf" path="res://spawner/ground_spawner.gd" id="5"]
+[ext_resource type="Script" uid="uid://6nlov38inxkn" path="res://pause_controller.gd" id="6"]
 
 [node name="main" type="Node2D" unique_id=392794174]
 script = ExtResource("1")
 
-[node name="Entities" type="Node2D" parent="."]
+[node name="Entities" type="Node2D" parent="." unique_id=1060344682]
 
-[node name="Player" parent="Entities" instance=ExtResource("2")]
+[node name="Player" parent="Entities" unique_id=711832952 instance=ExtResource("2")]
 position = Vector2(300, 720)
 
-[node name="Spawner" type="Node2D" parent="Entities"]
+[node name="Spawner" type="Node2D" parent="Entities" unique_id=726399956]
 script = ExtResource("3")
 
-[node name="FormationSpawner" type="Node2D" parent="Entities"]
+[node name="FormationSpawner" type="Node2D" parent="Entities" unique_id=2132747375]
 script = ExtResource("4")
 
-[node name="GroundSpawner" type="Node2D" parent="Entities"]
+[node name="GroundSpawner" type="Node2D" parent="Entities" unique_id=1026943564]
 script = ExtResource("5")
 
-[node name="UI" type="CanvasLayer" parent="."]
+[node name="UI" type="CanvasLayer" parent="." unique_id=950528685]
 
-[node name="ScoreLabel" type="Label" parent="UI"]
+[node name="ScoreLabel" type="Label" parent="UI" unique_id=1412444748]
 offset_left = 40.0
 offset_top = 24.0
 offset_right = 500.0
@@ -34,21 +34,21 @@ offset_bottom = 90.0
 theme_override_font_sizes/font_size = 40
 text = "SCORE: 0"
 
-[node name="HealthHearts" type="Node2D" parent="UI"]
+[node name="HealthHearts" type="Node2D" parent="UI" unique_id=714118804]
 position = Vector2(64, 112)
 
-[node name="CoinIcon" type="Node2D" parent="UI"]
+[node name="CoinIcon" type="Node2D" parent="UI" unique_id=1618512097]
 position = Vector2(64, 170)
 
-[node name="Rim" type="Polygon2D" parent="UI/CoinIcon"]
+[node name="Rim" type="Polygon2D" parent="UI/CoinIcon" unique_id=2145763467]
 color = Color(1, 0.8, 0.15, 1)
-polygon = PackedVector2Array(22.0, 0.0, 21.3, 5.7, 19.1, 11.0, 15.6, 15.6, 11.0, 19.1, 5.7, 21.3, 0.0, 22.0, -5.7, 21.3, -11.0, 19.1, -15.6, 15.6, -19.1, 11.0, -21.3, 5.7, -22.0, 0.0, -21.3, -5.7, -19.1, -11.0, -15.6, -15.6, -11.0, -19.1, -5.7, -21.3, -0.0, -22.0, 5.7, -21.3, 11.0, -19.1, 15.6, -15.6, 19.1, -11.0, 21.3, -5.7)
+polygon = PackedVector2Array(22, 0, 21.3, 5.7, 19.1, 11, 15.6, 15.6, 11, 19.1, 5.7, 21.3, 0, 22, -5.7, 21.3, -11, 19.1, -15.6, 15.6, -19.1, 11, -21.3, 5.7, -22, 0, -21.3, -5.7, -19.1, -11, -15.6, -15.6, -11, -19.1, -5.7, -21.3, 0, -22, 5.7, -21.3, 11, -19.1, 15.6, -15.6, 19.1, -11, 21.3, -5.7)
 
-[node name="Face" type="Polygon2D" parent="UI/CoinIcon"]
+[node name="Face" type="Polygon2D" parent="UI/CoinIcon" unique_id=1282185350]
 color = Color(0.85, 0.62, 0.05, 1)
-polygon = PackedVector2Array(14.0, 0.0, 13.5, 3.6, 12.1, 7.0, 9.9, 9.9, 7.0, 12.1, 3.6, 13.5, 0.0, 14.0, -3.6, 13.5, -7.0, 12.1, -9.9, 9.9, -12.1, 7.0, -13.5, 3.6, -14.0, 0.0, -13.5, -3.6, -12.1, -7.0, -9.9, -9.9, -7.0, -12.1, -3.6, -13.5, -0.0, -14.0, 3.6, -13.5, 7.0, -12.1, 9.9, -9.9, 12.1, -7.0, 13.5, -3.6)
+polygon = PackedVector2Array(14, 0, 13.5, 3.6, 12.1, 7, 9.9, 9.9, 7, 12.1, 3.6, 13.5, 0, 14, -3.6, 13.5, -7, 12.1, -9.9, 9.9, -12.1, 7, -13.5, 3.6, -14, 0, -13.5, -3.6, -12.1, -7, -9.9, -9.9, -7, -12.1, -3.6, -13.5, 0, -14, 3.6, -13.5, 7, -12.1, 9.9, -9.9, 12.1, -7, 13.5, -3.6)
 
-[node name="CurrencyLabel" type="Label" parent="UI"]
+[node name="CurrencyLabel" type="Label" parent="UI" unique_id=166253702]
 offset_left = 104.0
 offset_top = 136.0
 offset_right = 500.0
@@ -56,91 +56,97 @@ offset_bottom = 202.0
 theme_override_font_sizes/font_size = 40
 text = "0"
 
-[node name="GodModeLabel" type="Label" parent="UI"]
+[node name="GodModeLabel" type="Label" parent="UI" unique_id=212891162]
+visible = false
 offset_left = 2120.0
 offset_top = 24.0
 offset_right = 2520.0
 offset_bottom = 90.0
 theme_override_font_sizes/font_size = 40
 text = "GOD MODE"
-visible = false
 
-[node name="LevelLabel" type="Label" parent="UI"]
+[node name="LevelLabel" type="Label" parent="UI" unique_id=156054587]
+visible = false
 offset_left = 1000.0
 offset_top = 24.0
 offset_right = 1560.0
 offset_bottom = 100.0
 theme_override_font_sizes/font_size = 48
-horizontal_alignment = 1
 text = "LEVEL 1-1"
-visible = false
+horizontal_alignment = 1
 
-[node name="PauseLabel" type="Label" parent="UI"]
+[node name="PauseLabel" type="Label" parent="UI" unique_id=906901294]
+visible = false
 offset_left = 1080.0
 offset_top = 660.0
 offset_right = 1480.0
 offset_bottom = 740.0
 theme_override_font_sizes/font_size = 64
 text = "PAUSED"
-visible = false
 
-[node name="GameOverLabel" type="Label" parent="UI"]
+[node name="GameOverLabel" type="Label" parent="UI" unique_id=1299225686]
+visible = false
 offset_left = 980.0
 offset_top = 660.0
 offset_right = 1580.0
 offset_bottom = 740.0
 theme_override_font_sizes/font_size = 64
 text = "GAME OVER"
-visible = false
 
-[node name="RestartButton" type="Button" parent="UI"]
+[node name="RestartButton" type="Button" parent="UI" unique_id=424180825]
 process_mode = 3
+visible = false
 offset_left = 1080.0
 offset_top = 800.0
 offset_right = 1280.0
 offset_bottom = 866.0
 theme_override_font_sizes/font_size = 32
 text = "RESTART"
-visible = false
 
-[node name="CloseButton" type="Button" parent="UI"]
+[node name="CloseButton" type="Button" parent="UI" unique_id=1237831798]
 process_mode = 3
+visible = false
 offset_left = 1300.0
 offset_top = 800.0
 offset_right = 1480.0
 offset_bottom = 866.0
 theme_override_font_sizes/font_size = 32
 text = "CLOSE"
-visible = false
 
-[node name="ShopMenu" type="Control" parent="UI"]
+[node name="ShopMenu" type="Control" parent="UI" unique_id=1125034919]
 process_mode = 3
 visible = false
+layout_mode = 3
+anchors_preset = 0
 
-[node name="Dim" type="ColorRect" parent="UI/ShopMenu"]
+[node name="Dim" type="ColorRect" parent="UI/ShopMenu" unique_id=1939735493]
+layout_mode = 0
 offset_right = 2560.0
 offset_bottom = 1440.0
 color = Color(0, 0, 0, 0.8)
 
-[node name="TitleLabel" type="Label" parent="UI/ShopMenu"]
+[node name="TitleLabel" type="Label" parent="UI/ShopMenu" unique_id=747893158]
+layout_mode = 0
 offset_left = 880.0
 offset_top = 240.0
 offset_right = 1680.0
 offset_bottom = 380.0
 theme_override_font_sizes/font_size = 96
-horizontal_alignment = 1
 text = "SHOP"
+horizontal_alignment = 1
 
-[node name="CoinsLabel" type="Label" parent="UI/ShopMenu"]
+[node name="CoinsLabel" type="Label" parent="UI/ShopMenu" unique_id=1178467388]
+layout_mode = 0
 offset_left = 780.0
 offset_top = 400.0
 offset_right = 1780.0
 offset_bottom = 470.0
 theme_override_font_sizes/font_size = 48
-horizontal_alignment = 1
 text = "COINS: 0"
+horizontal_alignment = 1
 
-[node name="ResultLabel" type="Label" parent="UI/ShopMenu"]
+[node name="ResultLabel" type="Label" parent="UI/ShopMenu" unique_id=2137846004]
+layout_mode = 0
 offset_left = 780.0
 offset_top = 500.0
 offset_right = 1780.0
@@ -148,28 +154,32 @@ offset_bottom = 570.0
 theme_override_font_sizes/font_size = 48
 horizontal_alignment = 1
 
-[node name="Option0" type="Button" parent="UI/ShopMenu"]
+[node name="Option0" type="Button" parent="UI/ShopMenu" unique_id=102397624]
+layout_mode = 0
 offset_left = 780.0
 offset_top = 600.0
 offset_right = 1780.0
 offset_bottom = 700.0
 theme_override_font_sizes/font_size = 44
 
-[node name="Option1" type="Button" parent="UI/ShopMenu"]
+[node name="Option1" type="Button" parent="UI/ShopMenu" unique_id=1990383319]
+layout_mode = 0
 offset_left = 780.0
 offset_top = 720.0
 offset_right = 1780.0
 offset_bottom = 820.0
 theme_override_font_sizes/font_size = 44
 
-[node name="Option2" type="Button" parent="UI/ShopMenu"]
+[node name="Option2" type="Button" parent="UI/ShopMenu" unique_id=952835975]
+layout_mode = 0
 offset_left = 780.0
 offset_top = 840.0
 offset_right = 1780.0
 offset_bottom = 940.0
 theme_override_font_sizes/font_size = 44
 
-[node name="ContinueButton" type="Button" parent="UI/ShopMenu"]
+[node name="ContinueButton" type="Button" parent="UI/ShopMenu" unique_id=1757160393]
+layout_mode = 0
 offset_left = 1000.0
 offset_top = 1000.0
 offset_right = 1560.0
@@ -177,68 +187,67 @@ offset_bottom = 1090.0
 theme_override_font_sizes/font_size = 44
 text = "CONTINUE"
 
-[node name="SuperMeter" type="Node2D" parent="UI"]
+[node name="SuperMeter" type="Node2D" parent="UI" unique_id=41957649]
 position = Vector2(40, 1360)
 
-[node name="Bar0" type="ColorRect" parent="UI/SuperMeter"]
+[node name="Bar0" type="ColorRect" parent="UI/SuperMeter" unique_id=546885661]
 offset_right = 120.0
 offset_bottom = 36.0
 color = Color(0.22, 0.19, 0.08, 1)
 
-[node name="Fill" type="ColorRect" parent="UI/SuperMeter/Bar0"]
+[node name="Fill" type="ColorRect" parent="UI/SuperMeter/Bar0" unique_id=108880504]
+layout_mode = 0
 offset_bottom = 36.0
 color = Color(1, 0.85, 0.2, 1)
 
-[node name="Bar1" type="ColorRect" parent="UI/SuperMeter"]
+[node name="Bar1" type="ColorRect" parent="UI/SuperMeter" unique_id=582618308]
 offset_left = 132.0
 offset_right = 252.0
 offset_bottom = 36.0
 color = Color(0.22, 0.19, 0.08, 1)
 
-[node name="Fill" type="ColorRect" parent="UI/SuperMeter/Bar1"]
+[node name="Fill" type="ColorRect" parent="UI/SuperMeter/Bar1" unique_id=61780480]
+layout_mode = 0
 offset_bottom = 36.0
 color = Color(1, 0.85, 0.2, 1)
 
-[node name="Bar2" type="ColorRect" parent="UI/SuperMeter"]
+[node name="Bar2" type="ColorRect" parent="UI/SuperMeter" unique_id=88035857]
 offset_left = 264.0
 offset_right = 384.0
 offset_bottom = 36.0
 color = Color(0.22, 0.19, 0.08, 1)
 
-[node name="Fill" type="ColorRect" parent="UI/SuperMeter/Bar2"]
+[node name="Fill" type="ColorRect" parent="UI/SuperMeter/Bar2" unique_id=616556017]
+layout_mode = 0
 offset_bottom = 36.0
 color = Color(1, 0.85, 0.2, 1)
 
-[node name="SubBossBar" type="Node2D" parent="UI"]
-position = Vector2(1080, 40)
+[node name="SubBossBar" type="Node2D" parent="UI" unique_id=381582363]
 visible = false
+position = Vector2(1080, 40)
 
-[node name="Background" type="ColorRect" parent="UI/SubBossBar"]
-offset_left = 0.0
-offset_top = 0.0
+[node name="Background" type="ColorRect" parent="UI/SubBossBar" unique_id=1238686581]
 offset_right = 400.0
 offset_bottom = 24.0
 color = Color(0.15, 0.15, 0.18, 1)
 
-[node name="Fill" type="ColorRect" parent="UI/SubBossBar"]
-offset_left = 0.0
-offset_top = 0.0
+[node name="Fill" type="ColorRect" parent="UI/SubBossBar" unique_id=1445748491]
 offset_right = 400.0
 offset_bottom = 24.0
 color = Color(0.8, 0.15, 0.2, 1)
 
-[node name="SubBossTimer" type="Timer" parent="."]
+[node name="SubBossTimer" type="Timer" parent="." unique_id=949805321]
 wait_time = 45.0
 one_shot = true
 autostart = true
 
-[node name="PauseController" type="Node" parent="."]
+[node name="PauseController" type="Node" parent="." unique_id=1483620579]
 script = ExtResource("6")
 
-[connection signal="timeout" from="SubBossTimer" to="." method="_on_sub_boss_timer_timeout"]
 [connection signal="pressed" from="UI/RestartButton" to="." method="_on_restart_pressed"]
 [connection signal="pressed" from="UI/CloseButton" to="." method="_on_close_pressed"]
 [connection signal="pressed" from="UI/ShopMenu/Option0" to="." method="_on_shop_option_pressed" binds= [0]]
 [connection signal="pressed" from="UI/ShopMenu/Option1" to="." method="_on_shop_option_pressed" binds= [1]]
 [connection signal="pressed" from="UI/ShopMenu/Option2" to="." method="_on_shop_option_pressed" binds= [2]]
 [connection signal="pressed" from="UI/ShopMenu/ContinueButton" to="." method="_on_shop_continue_pressed"]
+[connection signal="timeout" from="SubBossTimer" to="." method="_on_sub_boss_timer_timeout"]

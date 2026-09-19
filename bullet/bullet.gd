@@ -14,13 +14,16 @@ var direction: Vector2 = Vector2.RIGHT
 var homing_target: Node2D
 var acquire_nearest_enemy: bool = false
 var homing_delay: float = 0.0
+var wave_amplitude: float = 0.0
+var wave_frequency: float = 0.0
+var wave_phase: float = 0.0
 var being_inhaled: bool = false
 var age: float = 0.0
 
 func _ready() -> void:
 	area_entered.connect(_on_area_entered)
 	if enemy_owned:
-		add_to_group("inhalable")
+		add_to_group("enemy_bullets")
 
 func _physics_process(delta: float) -> void:
 	if being_inhaled:
@@ -37,7 +40,10 @@ func _physics_process(delta: float) -> void:
 			var desired: Vector2 = (homing_target.global_position - global_position).normalized()
 			direction = direction.slerp(desired, turn_rate * delta).normalized()
 
-	position += direction * speed * delta
+	var velocity := direction * speed
+	if wave_amplitude != 0.0:
+		velocity += direction.orthogonal() * wave_amplitude * wave_frequency * cos(wave_frequency * age + wave_phase)
+	position += velocity * delta
 
 	if homing_delay > 0.0:
 		return
@@ -64,6 +70,7 @@ func _find_nearest_enemy() -> Node2D:
 func _on_area_entered(area: Area2D) -> void:
 	if area == self or not is_instance_valid(area):
 		return
-	if area.has_method("take_damage"):
-		area.take_damage(damage)
+	var health := HealthComponent.find(area)
+	if health != null:
+		health.take_damage(damage)
 		queue_free()

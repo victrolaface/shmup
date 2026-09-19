@@ -40,9 +40,8 @@ func _spawn_squad() -> void:
 	var p3 := Vector2(-150.0, exit_y)
 
 	for i in squad_size:
-		var unit := unit_scene.instantiate() as EnemyFormationUnit
-		unit.start_delay = float(i) * stagger_delay
-		unit.setup_curve(p0, p1, p2, p3)
+		var unit := unit_scene.instantiate() as Node2D
+		(unit.get_node("BezierPathComponent") as BezierPathComponent).setup(p0, p1, p2, p3, float(i) * stagger_delay)
 		get_parent().add_child(unit)
 
 func stop_spawning() -> void:

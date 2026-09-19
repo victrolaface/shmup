@@ -1,16 +1,20 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=10 format=3]
 
-[ext_resource type="Script" path="res://sub_boss/sub_boss.gd" id="1"]
+[ext_resource type="Script" path="res://components/health_component.gd" id="1"]
+[ext_resource type="Script" path="res://components/hit_flash_component.gd" id="2"]
+[ext_resource type="Script" path="res://components/death_effects_component.gd" id="3"]
+[ext_resource type="Script" path="res://components/drop_component.gd" id="4"]
+[ext_resource type="Script" path="res://components/approach_stop_component.gd" id="5"]
+[ext_resource type="Script" path="res://components/boss_attack_component.gd" id="6"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 324.0
 
-[node name="SubBoss" type="Area2D"]
+[node name="SubBoss" type="Area2D" groups=["enemies", "sub_boss"]]
 collision_layer = 2
 collision_mask = 1
 monitoring = true
 monitorable = true
-script = ExtResource("1")
 
 [node name="Visual" type="Polygon2D" parent="."]
 color = Color(0.6, 0.15, 0.7, 1)
@@ -19,6 +23,37 @@ polygon = PackedVector2Array(-324, -252, 216, -324, 324, 0, 216, 324, -324, 252,
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_1")
 
-[node name="AttackCooldown" type="Timer" parent="."]
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("1")
+max_health = 6000
 
-[connection signal="timeout" from="AttackCooldown" to="." method="_on_attack_cooldown_timeout"]
+[node name="HitFlashComponent" type="Node" parent="."]
+script = ExtResource("2")
+
+[node name="DeathEffectsComponent" type="Node" parent="."]
+script = ExtResource("3")
+score_value = 500
+spawn_explosion = false
+spawn_smoke = false
+
+[node name="DropComponent" type="Node" parent="."]
+script = ExtResource("4")
+charge_count = 5
+coin_count = 10
+jewel_chance = 0.0
+heart_chance = 0.0
+guaranteed_hearts = 2
+scatter = 420.0
+
+[node name="ApproachStopComponent" type="Node" parent="."]
+script = ExtResource("5")
+approach_speed = 220.0
+stop_x_min = 1900.0
+stop_x_max = 1900.0
+hover_amplitude = 220.0
+hover_frequency = 0.6
+
+[node name="BossAttackComponent" type="Node" parent="."]
+script = ExtResource("6")
+
+[connection signal="arrived" from="ApproachStopComponent" to="BossAttackComponent" method="start"]

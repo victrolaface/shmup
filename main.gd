@@ -54,13 +54,13 @@ func _ready() -> void:
 	Game.game_over.connect(_on_game_over)
 	Game.reset()
 
-	player.super_progress_changed.connect(_on_super_progress_changed)
+	player.super_meter.progress_changed.connect(_on_super_progress_changed)
 	_on_super_progress_changed(0.0)
 
-	player.god_mode_changed.connect(_on_god_mode_changed)
-	_build_health_hearts(player.max_health)
-	player.health_changed.connect(_on_health_changed)
-	_on_health_changed(player.health, player.max_health)
+	player.health.god_mode_changed.connect(_on_god_mode_changed)
+	_build_health_hearts(player.health.max_health)
+	player.health.health_changed.connect(_on_health_changed)
+	_on_health_changed(player.health.health, player.health.max_health)
 
 	sub_boss_bar.visible = false
 	_show_level_banner()
@@ -125,11 +125,13 @@ func _on_sub_boss_timer_timeout() -> void:
 	formation_spawner.stop_spawning()
 	ground_spawner.stop_spawning()
 
-	var sub_boss := SUB_BOSS_SCENE.instantiate() as SubBoss
+	var sub_boss := SUB_BOSS_SCENE.instantiate() as Node2D
 	sub_boss.position = Vector2(2900, 720)
 	entities.add_child(sub_boss)
-	sub_boss.health_changed.connect(_on_sub_boss_health_changed)
-	sub_boss.defeated.connect(_on_sub_boss_defeated)
+	var boss_health := HealthComponent.find(sub_boss)
+	boss_health.health_changed.connect(_on_sub_boss_health_changed)
+	boss_health.died.connect(_on_sub_boss_defeated)
+	_on_sub_boss_health_changed(boss_health.health, boss_health.max_health)
 
 	sub_boss_bar.visible = true
 
@@ -146,7 +148,7 @@ func _on_sub_boss_defeated() -> void:
 func _open_shop() -> void:
 	shop_open = true
 	get_tree().paused = true
-	shop_offers = player.roll_upgrade_offers(shop_option_buttons.size())
+	shop_offers = player.upgrades.roll_offers(shop_option_buttons.size())
 	shop_purchases = 0
 	shop_result_label.text = ""
 	_refresh_shop()
@@ -161,8 +163,8 @@ func _refresh_shop() -> void:
 		if not button.visible:
 			continue
 		var id := shop_offers[i]
-		var upgrade_name: String = Player.UPGRADE_NAMES[id]
-		if player.can_upgrade(id):
+		var upgrade_name: String = UpgradeComponent.UPGRADE_NAMES[id]
+		if player.upgrades.can_upgrade(id):
 			button.text = "%s  (%d COINS)" % [upgrade_name, UPGRADE_COST]
 			button.disabled = not purchases_left or Game.currency < UPGRADE_COST
 		else:
@@ -171,10 +173,10 @@ func _refresh_shop() -> void:
 
 func _on_shop_option_pressed(index: int) -> void:
 	var id := shop_offers[index]
-	if shop_purchases >= MAX_SHOP_PURCHASES or not player.can_upgrade(id) or not Game.spend_currency(UPGRADE_COST):
+	if shop_purchases >= MAX_SHOP_PURCHASES or not player.upgrades.can_upgrade(id) or not Game.spend_currency(UPGRADE_COST):
 		return
 	shop_purchases += 1
-	shop_result_label.text = "GOT: " + player.apply_upgrade(id)
+	shop_result_label.text = "GOT: " + player.upgrades.apply_upgrade(id)
 	_refresh_shop()
 
 func _on_shop_continue_pressed() -> void:

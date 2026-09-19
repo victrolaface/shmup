@@ -14,6 +14,8 @@ var interval_scale: float = 1.0
 @export var spawn_x: float = 2650.0
 @export var spawn_y_min: float = 80.0
 @export var spawn_y_max: float = 1360.0
+@export var medium_scene: PackedScene = preload("res://enemy/enemy_medium.tscn")
+@export var medium_chance: float = 0.12
 
 var spawning: bool = true
 var elapsed: float = 0.0
@@ -34,9 +36,13 @@ func _physics_process(delta: float) -> void:
 		_spawn_enemy()
 
 func _spawn_enemy() -> void:
-	var scene: PackedScene = enemy_scenes[randi() % enemy_scenes.size()]
+	var is_medium := randf() < medium_chance
+	var scene: PackedScene = medium_scene if is_medium else enemy_scenes[randi() % enemy_scenes.size()]
 	var enemy := scene.instantiate() as Node2D
-	enemy.position = Vector2(spawn_x, randf_range(spawn_y_min, spawn_y_max))
+	var y := randf_range(spawn_y_min, spawn_y_max)
+	if is_medium:
+		y = clamp(y, 250.0, 1190.0)
+	enemy.position = Vector2(spawn_x, y)
 	get_parent().add_child(enemy)
 
 func stop_spawning() -> void:
