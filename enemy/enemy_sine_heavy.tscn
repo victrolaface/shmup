@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="PackedScene" path="res://enemy/enemy.tscn" id="1"]
+
+[node name="EnemySineHeavy" instance=ExtResource("1")]
+pattern = 2
+health = 4
+score_value = 15
