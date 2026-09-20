@@ -1,60 +1,15 @@
-[gd_scene load_steps=18 format=3]
+[gd_scene format=3 uid="uid://cq4o4p650u3bp"]
 
-[ext_resource type="Script" path="res://components/health_component.gd" id="1"]
-[ext_resource type="Script" path="res://components/hit_flash_component.gd" id="2"]
-[ext_resource type="Script" path="res://components/death_effects_component.gd" id="3"]
-[ext_resource type="Script" path="res://components/drop_component.gd" id="4"]
-[ext_resource type="Script" path="res://components/approach_stop_component.gd" id="5"]
-[ext_resource type="Script" path="res://components/boss_attack_component.gd" id="6"]
-[ext_resource type="Script" path="res://components/boss_animation_component.gd" id="7"]
+[ext_resource type="Script" uid="uid://bpaqbwhvxyci1" path="res://components/health_component.gd" id="1"]
+[ext_resource type="Script" uid="uid://qd00g4a3rxcv" path="res://components/hit_flash_component.gd" id="2"]
+[ext_resource type="Script" uid="uid://do5lruqxe8qqr" path="res://components/death_effects_component.gd" id="3"]
+[ext_resource type="Script" uid="uid://b3il0va8kmlir" path="res://components/drop_component.gd" id="4"]
+[ext_resource type="Script" uid="uid://dlgmneil1m37o" path="res://components/approach_stop_component.gd" id="5"]
+[ext_resource type="Script" uid="uid://c8hy6hnxuok55" path="res://components/boss_animation_component.gd" id="7"]
+[ext_resource type="Script" uid="uid://bnl56a3gaq4yk" path="res://components/shooter_component.gd" id="8"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 324.0
-
-[sub_resource type="Animation" id="Animation_idle"]
-resource_name = "idle"
-length = 3.0
-loop_mode = 1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Visual:scale")
-tracks/0/interp = 2
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 1.5, 3),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [Vector2(1, 1), Vector2(1.025, 1.025), Vector2(1, 1)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Visual:rotation")
-tracks/1/interp = 2
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.75, 1.5, 2.25, 3),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
-"update": 0,
-"values": [0.0, 0.02, 0.0, -0.02, 0.0]
-}
-
-[sub_resource type="Animation" id="Animation_hit"]
-resource_name = "hit"
-length = 0.15
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Visual:scale")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.05, 0.15),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [Vector2(1, 1), Vector2(1.04, 1.04), Vector2(1, 1)]
-}
 
 [sub_resource type="Animation" id="Animation_attack_homing_cone"]
 resource_name = "attack_homing_cone"
@@ -110,6 +65,34 @@ tracks/1/keys = {
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
 "values": [Vector2(1, 1), Vector2(1.1, 0.94), Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_attack_radial"]
+resource_name = "attack_radial"
+length = 0.9
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Visual:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.15, 0.9),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(1.09, 1.09), Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Visual:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.15, 0.9),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1.6, 1.6, 1.8, 1), Color(1, 1, 1, 1)]
 }
 
 [sub_resource type="Animation" id="Animation_attack_surround_stream"]
@@ -180,69 +163,138 @@ tracks/2/keys = {
 "values": [Color(1, 1, 1, 1), Color(2, 2, 2, 1), Color(2, 2, 2, 0)]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_boss"]
-_data = {
-"attack_homing_cone": SubResource("Animation_attack_homing_cone"),
-"attack_horizontal_line": SubResource("Animation_attack_horizontal_line"),
-"attack_surround_stream": SubResource("Animation_attack_surround_stream"),
-"death": SubResource("Animation_death"),
-"hit": SubResource("Animation_hit"),
-"idle": SubResource("Animation_idle")
+[sub_resource type="Animation" id="Animation_hit"]
+resource_name = "hit"
+length = 0.15
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Visual:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.05, 0.15),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(1.04, 1.04), Vector2(1, 1)]
 }
 
-[node name="SubBoss" type="Area2D" groups=["enemies", "sub_boss"]]
-collision_layer = 2
-collision_mask = 1
-monitoring = true
-monitorable = true
+[sub_resource type="Animation" id="Animation_idle"]
+resource_name = "idle"
+length = 3.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Visual:scale")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1.5, 3),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(1.025, 1.025), Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Visual:rotation")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.75, 1.5, 2.25, 3),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [0.0, 0.02, 0.0, -0.02, 0.0]
+}
 
-[node name="Visual" type="Polygon2D" parent="."]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_boss"]
+_data = {
+&"attack_homing_cone": SubResource("Animation_attack_homing_cone"),
+&"attack_horizontal_line": SubResource("Animation_attack_horizontal_line"),
+&"attack_radial": SubResource("Animation_attack_radial"),
+&"attack_surround_stream": SubResource("Animation_attack_surround_stream"),
+&"death": SubResource("Animation_death"),
+&"hit": SubResource("Animation_hit"),
+&"idle": SubResource("Animation_idle")
+}
+
+[node name="SubBoss" type="Area2D" unique_id=1732701256 groups=["enemies", "sub_boss"]]
+collision_layer = 2
+
+[node name="Visual" type="Polygon2D" parent="." unique_id=1641988746]
 color = Color(0.6, 0.15, 0.7, 1)
 polygon = PackedVector2Array(-324, -252, 216, -324, 324, 0, 216, 324, -324, 252, -180, 0)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1158627178]
 shape = SubResource("CircleShape2D_1")
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {
-"": SubResource("AnimationLibrary_boss")
-}
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=2079571403]
+libraries/ = SubResource("AnimationLibrary_boss")
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=1340149171]
 script = ExtResource("1")
-max_health = 800
+max_health = 1800
 free_on_death = false
 
-[node name="HitFlashComponent" type="Node" parent="."]
+[node name="HitFlashComponent" type="Node" parent="." unique_id=500998656]
 script = ExtResource("2")
 
-[node name="DeathEffectsComponent" type="Node" parent="."]
+[node name="DeathEffectsComponent" type="Node" parent="." unique_id=877217961]
 script = ExtResource("3")
 score_value = 500
 spawn_explosion = false
 spawn_smoke = false
 
-[node name="DropComponent" type="Node" parent="."]
+[node name="DropComponent" type="Node" parent="." unique_id=1597667604]
 script = ExtResource("4")
 charge_count = 5
 coin_count = 10
-jewel_chance = 0.0
 heart_chance = 0.0
 guaranteed_hearts = 2
 scatter = 420.0
 
-[node name="ApproachStopComponent" type="Node" parent="."]
+[node name="ApproachStopComponent" type="Node" parent="." unique_id=1519653204]
 script = ExtResource("5")
 approach_speed = 220.0
 stop_x_min = 1900.0
 stop_x_max = 1900.0
 hover_amplitude = 220.0
-hover_frequency = 0.6
 
-[node name="BossAttackComponent" type="Node" parent="."]
-script = ExtResource("6")
+[node name="RadialShooter" type="Node" parent="." unique_id=500454970]
+script = ExtResource("8")
+mode = 5
+bullet_speed = 420.0
+interval = 0.11
+autostart = false
+burst_count = 14
+burst_pause = 1.5
+single_burst = true
 
-[node name="BossAnimationComponent" type="Node" parent="."]
+[node name="FanShooter" type="Node" parent="." unique_id=982927979]
+script = ExtResource("8")
+mode = 6
+bullet_speed = 380.0
+interval = 0.35
+autostart = false
+burst_count = 6
+burst_pause = 1.5
+single_burst = true
+
+[node name="CurtainShooter" type="Node" parent="." unique_id=902185949]
+script = ExtResource("8")
+mode = 7
+bullet_speed = 380.0
+interval = 0.3
+autostart = false
+burst_count = 4
+burst_pause = 1.5
+single_burst = true
+
+[node name="BossAnimationComponent" type="Node" parent="." unique_id=498097476]
 script = ExtResource("7")
 
-[connection signal="arrived" from="ApproachStopComponent" to="BossAttackComponent" method="start"]
+[connection signal="arrived" from="ApproachStopComponent" to="RadialShooter" method="start"]
+[connection signal="burst_finished" from="RadialShooter" to="FanShooter" method="start"]
+[connection signal="burst_finished" from="FanShooter" to="CurtainShooter" method="start"]
+[connection signal="burst_finished" from="CurtainShooter" to="RadialShooter" method="start"]

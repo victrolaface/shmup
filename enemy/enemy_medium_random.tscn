@@ -40,7 +40,6 @@ score_value = 60
 script = ExtResource("4")
 charge_count = 3
 coin_count = 4
-jewel_chance = 0.6
 
 [node name="ContactDamageComponent" type="Node" parent="."]
 script = ExtResource("5")

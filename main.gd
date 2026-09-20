@@ -19,6 +19,7 @@ const MAX_SHOP_PURCHASES := 2
 @onready var game_over_label: Label = $UI/GameOverLabel
 @onready var restart_button: Button = $UI/RestartButton
 @onready var close_button: Button = $UI/CloseButton
+@onready var skip_boss_button: Button = $UI/SkipBossButton
 @onready var pause_label: Label = $UI/PauseLabel
 @onready var god_mode_label: Label = $UI/GodModeLabel
 @onready var level_label: Label = $UI/LevelLabel
@@ -39,10 +40,12 @@ const MAX_SHOP_PURCHASES := 2
 @onready var spawner: Spawner = $Entities/Spawner
 @onready var formation_spawner: FormationSpawner = $Entities/FormationSpawner
 @onready var ground_spawner: GroundSpawner = $Entities/GroundSpawner
+@onready var swarm_spawner: SwarmSpawner = $Entities/SwarmSpawner
 
 var is_paused: bool = false
 var is_game_over: bool = false
 var shop_open: bool = false
+var boss_active: bool = false
 var shop_offers: Array[String] = []
 var shop_purchases: int = 0
 var level_major: int = 1
@@ -70,6 +73,7 @@ func _set_spawn_interval_scale(interval_scale: float) -> void:
 	spawner.interval_scale = interval_scale
 	formation_spawner.interval_scale = interval_scale
 	ground_spawner.interval_scale = interval_scale
+	swarm_spawner.interval_scale = interval_scale
 
 func _on_pause_input() -> void:
 	if is_game_over or shop_open:
@@ -120,10 +124,19 @@ func _show_level_banner() -> void:
 	tween.tween_interval(LEVEL_BANNER_DURATION)
 	tween.tween_callback(func() -> void: level_label.visible = false)
 
+func _on_skip_boss_pressed() -> void:
+	if boss_active or shop_open or is_game_over:
+		return
+	sub_boss_timer.stop()
+	_on_sub_boss_timer_timeout()
+
 func _on_sub_boss_timer_timeout() -> void:
+	boss_active = true
+	skip_boss_button.visible = false
 	spawner.stop_spawning()
 	formation_spawner.stop_spawning()
 	ground_spawner.stop_spawning()
+	swarm_spawner.stop_spawning()
 
 	var sub_boss := SUB_BOSS_SCENE.instantiate() as Node2D
 	sub_boss.position = Vector2(2900, 720)
@@ -186,6 +199,8 @@ func _on_shop_continue_pressed() -> void:
 	_start_next_level()
 
 func _start_next_level() -> void:
+	boss_active = false
+	skip_boss_button.visible = true
 	level_minor += 1
 	_show_level_banner()
 	_set_spawn_interval_scale(1.0)
@@ -193,10 +208,12 @@ func _start_next_level() -> void:
 	spawner.resume_spawning()
 	formation_spawner.resume_spawning()
 	ground_spawner.resume_spawning()
+	swarm_spawner.resume_spawning()
 	sub_boss_timer.start()
 
 func _on_game_over() -> void:
 	is_game_over = true
+	skip_boss_button.visible = false
 	game_over_label.visible = true
 	restart_button.visible = true
 	close_button.visible = true

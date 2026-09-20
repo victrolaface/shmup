@@ -1,18 +1,17 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://cus3ob60fbjka"]
 
-[ext_resource type="Script" path="res://components/magnet_component.gd" id="1"]
-[ext_resource type="Script" path="res://components/collect_effect_component.gd" id="2"]
+[ext_resource type="Script" uid="uid://crx1jm0hf3a7p" path="res://components/magnet_component.gd" id="1"]
+[ext_resource type="Script" uid="uid://bcdscc1wsm01o" path="res://components/collect_effect_component.gd" id="2"]
 
-[node name="ChargePickup" type="Node2D"]
+[node name="ChargePickup" type="Node2D" unique_id=1544467184]
 
-[node name="Visual" type="Polygon2D" parent="."]
+[node name="Visual" type="Polygon2D" parent="." unique_id=115366273]
 color = Color(0.3, 0.95, 1, 1)
 polygon = PackedVector2Array(14, 0, 9.9, 9.9, 0, 14, -9.9, 9.9, -14, 0, -9.9, -9.9, 0, -14, 9.9, -9.9)
 
-[node name="MagnetComponent" type="Node" parent="."]
+[node name="MagnetComponent" type="Node" parent="." unique_id=210283873]
 script = ExtResource("1")
 
-[node name="CollectEffectComponent" type="Node" parent="."]
+[node name="CollectEffectComponent" type="Node" parent="." unique_id=976859594]
 script = ExtResource("2")
-kind = 0
-amount = 0.125
+amount = 0.0625

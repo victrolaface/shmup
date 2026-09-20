@@ -3,10 +3,10 @@ extends Component
 
 var indicator: Polygon2D
 var visual: Polygon2D
-@export var inhale_radius: float = 260.0
+@export var inhale_radius: float = 90.0
 @export var swallow_distance: float = 60.0
 @export var pull_speed: float = 1150.0
-@export var charge_per_swallow: float = 0.125
+@export var charge_per_swallow: float = 0.0625
 
 var super_meter: SuperComponent
 var base_color: Color

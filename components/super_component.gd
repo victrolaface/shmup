@@ -8,17 +8,24 @@ signal progress_changed(progress: float)
 @export var base_radius: float = 300.0
 @export var radius_step: float = 200.0
 @export var damage_per_charge: int = 4
-@export var wave_count: int = 3
-@export var bullets_per_wave: int = 60
+@export var waves_by_level: PackedInt32Array = PackedInt32Array([2, 4, 6])
+@export var bullets_per_wave_by_level: PackedInt32Array = PackedInt32Array([36, 48, 60])
 @export var wave_interval: float = 0.3
 @export var bullet_speed: float = 1000.0
+@export var bombardment_min_level: int = 3
 
 var progress: float = 0.0
 var charge: int = 0
 var nova_active: bool = false
 var nova_elapsed: float = 0.0
 var waves_spawned: int = 0
+var current_wave_count: int = 0
+var current_bullets_per_wave: int = 0
 var nova_damage: int = 0
+var bombardment: BombardmentComponent
+
+func _ready() -> void:
+	bombardment = Component.of(entity, "BombardmentComponent") as BombardmentComponent
 
 func grant_charge(amount: float) -> void:
 	progress = min(progress + amount, float(max_charge))
@@ -28,10 +35,10 @@ func grant_charge(amount: float) -> void:
 func _physics_process(delta: float) -> void:
 	if nova_active:
 		nova_elapsed += delta
-		while waves_spawned < wave_count and nova_elapsed >= float(waves_spawned) * wave_interval:
+		while waves_spawned < current_wave_count and nova_elapsed >= float(waves_spawned) * wave_interval:
 			_spawn_wave(waves_spawned)
 			waves_spawned += 1
-		if waves_spawned >= wave_count:
+		if waves_spawned >= current_wave_count:
 			nova_active = false
 
 	if charge > 0 and Input.is_action_just_pressed("super"):
@@ -43,6 +50,10 @@ func _unleash() -> void:
 	progress = 0.0
 	progress_changed.emit(progress)
 
+	var tier := clampi(level, 1, waves_by_level.size()) - 1
+	current_wave_count = waves_by_level[tier]
+	current_bullets_per_wave = bullets_per_wave_by_level[tier]
+
 	var radius := base_radius + float(level - 1) * radius_step
 	var damage := damage_per_charge * level
 	_spawn_blast(radius)
@@ -52,6 +63,9 @@ func _unleash() -> void:
 	nova_elapsed = 0.0
 	waves_spawned = 0
 	nova_active = true
+
+	if bombardment != null and level >= bombardment_min_level:
+		bombardment.start(level)
 
 func _clear_nearby(radius: float, damage: int) -> void:
 	var targets := get_tree().get_nodes_in_group("enemies") + get_tree().get_nodes_in_group("enemy_bullets")
@@ -68,10 +82,10 @@ func _clear_nearby(radius: float, damage: int) -> void:
 			target.queue_free()
 
 func _spawn_wave(wave_index: int) -> void:
-	var angle_offset := (TAU / float(bullets_per_wave)) * float(wave_index) / float(wave_count)
+	var angle_offset := (TAU / float(current_bullets_per_wave)) * float(wave_index) / float(current_wave_count)
 
-	for i in bullets_per_wave:
-		var angle := (float(i) / float(bullets_per_wave)) * TAU + angle_offset
+	for i in current_bullets_per_wave:
+		var angle := (float(i) / float(current_bullets_per_wave)) * TAU + angle_offset
 		var bullet := bullet_scene.instantiate() as Bullet
 		entity.get_parent().add_child(bullet)
 		bullet.direction = Vector2.RIGHT.rotated(angle)
