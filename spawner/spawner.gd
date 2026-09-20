@@ -7,15 +7,17 @@ extends Node2D
 	preload("res://enemy/enemy_sine_heavy.tscn"),
 	preload("res://enemy/enemy_chaser.tscn"),
 ]
-@export var spawn_interval_start: float = 1.4
-@export var spawn_interval_min: float = 0.5
-@export var ramp_duration: float = 90.0
+@export var spawn_interval_start: float = 1.8
+@export var spawn_interval_min: float = 0.8
+@export var ramp_duration: float = 150.0
 var interval_scale: float = 1.0
 @export var spawn_x: float = 2650.0
 @export var spawn_y_min: float = 80.0
 @export var spawn_y_max: float = 1360.0
 @export var medium_scene: PackedScene = preload("res://enemy/enemy_medium.tscn")
-@export var medium_chance: float = 0.12
+@export var medium_chance: float = 0.08
+@export var medium_random_scene: PackedScene = preload("res://enemy/enemy_medium_random.tscn")
+@export var medium_random_chance: float = 0.04
 
 var spawning: bool = true
 var elapsed: float = 0.0
@@ -36,8 +38,15 @@ func _physics_process(delta: float) -> void:
 		_spawn_enemy()
 
 func _spawn_enemy() -> void:
-	var is_medium := randf() < medium_chance
-	var scene: PackedScene = medium_scene if is_medium else enemy_scenes[randi() % enemy_scenes.size()]
+	var roll := randf()
+	var scene: PackedScene = enemy_scenes[randi() % enemy_scenes.size()]
+	var is_medium := true
+	if roll < medium_random_chance:
+		scene = medium_random_scene
+	elif roll < medium_random_chance + medium_chance:
+		scene = medium_scene
+	else:
+		is_medium = false
 	var enemy := scene.instantiate() as Node2D
 	var y := randf_range(spawn_y_min, spawn_y_max)
 	if is_medium:

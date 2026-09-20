@@ -1,55 +1,50 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene format=3 uid="uid://bqid83hmg3xj2"]
 
-[ext_resource type="Script" path="res://components/health_component.gd" id="1"]
-[ext_resource type="Script" path="res://components/hit_flash_component.gd" id="2"]
-[ext_resource type="Script" path="res://components/death_effects_component.gd" id="3"]
-[ext_resource type="Script" path="res://components/drop_component.gd" id="4"]
-[ext_resource type="Script" path="res://components/contact_damage_component.gd" id="5"]
-[ext_resource type="Script" path="res://components/offscreen_cull_component.gd" id="6"]
-[ext_resource type="Script" path="res://components/wave_move_component.gd" id="7"]
-[ext_resource type="Script" path="res://components/shooter_component.gd" id="8"]
+[ext_resource type="Script" uid="uid://bpaqbwhvxyci1" path="res://components/health_component.gd" id="1"]
+[ext_resource type="Script" uid="uid://qd00g4a3rxcv" path="res://components/hit_flash_component.gd" id="2"]
+[ext_resource type="Script" uid="uid://do5lruqxe8qqr" path="res://components/death_effects_component.gd" id="3"]
+[ext_resource type="Script" uid="uid://b3il0va8kmlir" path="res://components/drop_component.gd" id="4"]
+[ext_resource type="Script" uid="uid://b5upwlpm4v4hs" path="res://components/contact_damage_component.gd" id="5"]
+[ext_resource type="Script" uid="uid://d0dumfvhdp2nm" path="res://components/offscreen_cull_component.gd" id="6"]
+[ext_resource type="Script" uid="uid://d13ud6l8r4nxo" path="res://components/wave_move_component.gd" id="7"]
+[ext_resource type="Script" uid="uid://bnl56a3gaq4yk" path="res://components/shooter_component.gd" id="8"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 22.0
 
-[node name="EnemySineHeavy" type="Area2D" groups=["enemies"]]
+[node name="EnemySineHeavy" type="Area2D" unique_id=964039111 groups=["enemies"]]
 collision_layer = 2
-collision_mask = 1
-monitoring = true
-monitorable = true
 
-[node name="Visual" type="Polygon2D" parent="."]
+[node name="Visual" type="Polygon2D" parent="." unique_id=596570205]
 color = Color(0.9, 0.3, 0.3, 1)
 polygon = PackedVector2Array(-24, 0, 16, -18, 24, 0, 16, 18)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2095223470]
 shape = SubResource("CircleShape2D_1")
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=1651693470]
 script = ExtResource("1")
 max_health = 4
 
-[node name="HitFlashComponent" type="Node" parent="."]
+[node name="HitFlashComponent" type="Node" parent="." unique_id=2077528845]
 script = ExtResource("2")
 
-[node name="DeathEffectsComponent" type="Node" parent="."]
+[node name="DeathEffectsComponent" type="Node" parent="." unique_id=749575937]
 script = ExtResource("3")
 score_value = 15
 
-[node name="DropComponent" type="Node" parent="."]
+[node name="DropComponent" type="Node" parent="." unique_id=1228905685]
 script = ExtResource("4")
 
-[node name="ContactDamageComponent" type="Node" parent="."]
+[node name="ContactDamageComponent" type="Node" parent="." unique_id=538546917]
 script = ExtResource("5")
 
-[node name="OffscreenCullComponent" type="Node" parent="."]
+[node name="OffscreenCullComponent" type="Node" parent="." unique_id=207150595]
 script = ExtResource("6")
 
-[node name="WaveMoveComponent" type="Node" parent="."]
+[node name="WaveMoveComponent" type="Node" parent="." unique_id=197001149]
 script = ExtResource("7")
-speed = 260.0
 amplitude = 216.0
-frequency = 1.0
 
-[node name="ShooterComponent" type="Node" parent="."]
+[node name="ShooterComponent" type="Node" parent="." unique_id=194753562]
 script = ExtResource("8")

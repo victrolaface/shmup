@@ -2,9 +2,9 @@ class_name FormationSpawner
 extends Node2D
 
 @export var unit_scene: PackedScene = preload("res://enemy/enemy_formation_unit.tscn")
-@export var squad_interval_start: float = 5.0
-@export var squad_interval_min: float = 2.5
-@export var ramp_duration: float = 90.0
+@export var squad_interval_start: float = 6.0
+@export var squad_interval_min: float = 3.5
+@export var ramp_duration: float = 150.0
 var interval_scale: float = 1.0
 @export var squad_size: int = 5
 @export var stagger_delay: float = 0.12

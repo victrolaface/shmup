@@ -1,13 +1,15 @@
 class_name BossAttackComponent
 extends Component
 
+signal attack_started(attack: int)
+
 enum Attack { HOMING_CONE, HORIZONTAL_LINE, SURROUND_STREAM }
 
 @export var bullet_scene: PackedScene = preload("res://bullet/bullet_enemy.tscn")
 @export var attack_interval: float = 2.2
-@export var bullet_count: int = 80
+@export var bullet_count: int = 60
 @export var bullets_per_tick: int = 8
-@export var bullet_speed: float = 1200.0
+@export var bullet_speed: float = 900.0
 @export var bullet_damage: int = 1
 @export var spread_angle_degrees: float = 200.0
 @export var line_cone_angle_degrees: float = 45.0
@@ -15,7 +17,7 @@ enum Attack { HOMING_CONE, HORIZONTAL_LINE, SURROUND_STREAM }
 @export var line_target_y_max: float = 1300.0
 @export var stream_arms: int = 10
 @export var stream_rotation_speed: float = 1.4
-@export var stream_bullet_speed: float = 700.0
+@export var stream_bullet_speed: float = 600.0
 
 var active: bool = false
 var cooldown: float = 0.0
@@ -45,6 +47,7 @@ func _begin_attack() -> void:
 	active_attack = next_attack
 	next_attack = (next_attack + 1) % 3
 	bullets_remaining = bullet_count
+	attack_started.emit(active_attack)
 	if active_attack == Attack.HORIZONTAL_LINE:
 		var target_y := randf_range(line_target_y_min, line_target_y_max)
 		line_center_dir = (Vector2(0.0, target_y) - entity.global_position).normalized()

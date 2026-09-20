@@ -12,8 +12,6 @@ const OFFSCREEN_MARGIN := 100.0
 
 var direction: Vector2 = Vector2.RIGHT
 var homing_target: Node2D
-var acquire_nearest_enemy: bool = false
-var homing_delay: float = 0.0
 var wave_amplitude: float = 0.0
 var wave_frequency: float = 0.0
 var wave_phase: float = 0.0
@@ -31,41 +29,18 @@ func _physics_process(delta: float) -> void:
 
 	age += delta
 
-	if homing_delay > 0.0:
-		homing_delay = max(homing_delay - delta, 0.0)
-	else:
-		if acquire_nearest_enemy and (homing_target == null or not is_instance_valid(homing_target)):
-			homing_target = _find_nearest_enemy()
-		if homing_target != null and is_instance_valid(homing_target):
-			var desired: Vector2 = (homing_target.global_position - global_position).normalized()
-			direction = direction.slerp(desired, turn_rate * delta).normalized()
+	if homing_target != null and is_instance_valid(homing_target):
+		var desired: Vector2 = (homing_target.global_position - global_position).normalized()
+		direction = direction.slerp(desired, turn_rate * delta).normalized()
 
 	var velocity := direction * speed
 	if wave_amplitude != 0.0:
 		velocity += direction.orthogonal() * wave_amplitude * wave_frequency * cos(wave_frequency * age + wave_phase)
 	position += velocity * delta
 
-	if homing_delay > 0.0:
-		return
-
 	if global_position.x < -OFFSCREEN_MARGIN or global_position.x > WORLD_WIDTH + OFFSCREEN_MARGIN \
 			or global_position.y < -OFFSCREEN_MARGIN or global_position.y > WORLD_HEIGHT + OFFSCREEN_MARGIN:
 		queue_free()
-
-func _find_nearest_enemy() -> Node2D:
-	var nearest: Node2D = null
-	var nearest_dist_sq := INF
-	for node in get_tree().get_nodes_in_group("enemies"):
-		if not is_instance_valid(node):
-			continue
-		var target := node as Node2D
-		if target == null:
-			continue
-		var dist_sq := global_position.distance_squared_to(target.global_position)
-		if dist_sq < nearest_dist_sq:
-			nearest_dist_sq = dist_sq
-			nearest = target
-	return nearest
 
 func _on_area_entered(area: Area2D) -> void:
 	if area == self or not is_instance_valid(area):

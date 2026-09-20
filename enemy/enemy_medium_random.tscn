@@ -10,37 +10,37 @@
 [ext_resource type="Script" path="res://components/shooter_component.gd" id="8"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
-radius = 40.0
+radius = 44.0
 
-[node name="EnemyMedium" type="Area2D" groups=["enemies"]]
+[node name="EnemyMediumRandom" type="Area2D" groups=["enemies"]]
 collision_layer = 2
 collision_mask = 1
 monitoring = true
 monitorable = true
 
 [node name="Visual" type="Polygon2D" parent="."]
-color = Color(0.2, 0.7, 0.8, 1)
-polygon = PackedVector2Array(-44, 0, -20, -34, 24, -40, 46, -14, 46, 14, 24, 40, -20, 34)
+color = Color(0.85, 0.55, 0.2, 1)
+polygon = PackedVector2Array(-46, 0, -23, -40, 23, -40, 46, 0, 23, 40, -23, 40)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_1")
 
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("1")
-max_health = 20
+max_health = 30
 
 [node name="HitFlashComponent" type="Node" parent="."]
 script = ExtResource("2")
 
 [node name="DeathEffectsComponent" type="Node" parent="."]
 script = ExtResource("3")
-score_value = 40
+score_value = 60
 
 [node name="DropComponent" type="Node" parent="."]
 script = ExtResource("4")
-charge_count = 2
-coin_count = 3
-jewel_chance = 0.5
+charge_count = 3
+coin_count = 4
+jewel_chance = 0.6
 
 [node name="ContactDamageComponent" type="Node" parent="."]
 script = ExtResource("5")
@@ -55,17 +55,16 @@ stop_x_min = 1500.0
 stop_x_max = 2000.0
 hover_amplitude = 140.0
 hover_frequency = 0.7
-stay_duration = 14.0
+stay_duration = 18.0
 
 [node name="ShooterComponent" type="Node" parent="."]
 script = ExtResource("8")
-mode = 3
+mode = 4
 bullet_speed = 460.0
-interval = 0.09
 autostart = false
 start_on_screen = true
-burst_count = 14
-burst_pause = 1.4
+pick_pattern_once = true
+burst_pause = 1.1
 wave_amplitude = 100.0
 wave_frequency = 5.0
 

@@ -3,9 +3,9 @@ extends Node2D
 
 @export var figure8_scene: PackedScene = preload("res://enemy/enemy_ground_figure8.tscn")
 @export var sniper_scene: PackedScene = preload("res://enemy/enemy_ground_sniper.tscn")
-@export var spawn_interval_start: float = 4.0
-@export var spawn_interval_min: float = 2.0
-@export var ramp_duration: float = 90.0
+@export var spawn_interval_start: float = 5.0
+@export var spawn_interval_min: float = 3.0
+@export var ramp_duration: float = 150.0
 var interval_scale: float = 1.0
 @export var spawn_x: float = 2650.0
 @export var ground_y: float = 1280.0

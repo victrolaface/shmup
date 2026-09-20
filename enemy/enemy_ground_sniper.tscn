@@ -47,7 +47,7 @@ script = ExtResource("6")
 [node name="ShooterComponent" type="Node" parent="."]
 script = ExtResource("7")
 mode = 1
-bullet_speed = 1050.0
+bullet_speed = 850.0
 interval = 1.6
 autostart = false
 

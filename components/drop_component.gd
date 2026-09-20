@@ -9,7 +9,7 @@ const HEART_SCENE := preload("res://pickup/heart.tscn")
 @export var charge_count: int = 1
 @export var coin_count: int = 1
 @export var jewel_chance: float = 0.25
-@export var heart_chance: float = 0.06
+@export var heart_chance: float = 0.10
 @export var guaranteed_hearts: int = 0
 @export var scatter: float = 30.0
 

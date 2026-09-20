@@ -8,18 +8,16 @@ signal progress_changed(progress: float)
 @export var base_radius: float = 300.0
 @export var radius_step: float = 200.0
 @export var damage_per_charge: int = 4
-@export var bullet_count: int = 500
-@export var bullets_per_tick: int = 50
+@export var wave_count: int = 3
+@export var bullets_per_wave: int = 60
+@export var wave_interval: float = 0.3
 @export var bullet_speed: float = 1000.0
-@export var expand_duration: float = 1.0
-@export var single_target_turn_rate: float = 20.0
 
 var progress: float = 0.0
 var charge: int = 0
 var nova_active: bool = false
 var nova_elapsed: float = 0.0
-var nova_bullets_remaining: int = 0
-var nova_bullets_spawned: int = 0
+var waves_spawned: int = 0
 var nova_damage: int = 0
 
 func grant_charge(amount: float) -> void:
@@ -30,9 +28,10 @@ func grant_charge(amount: float) -> void:
 func _physics_process(delta: float) -> void:
 	if nova_active:
 		nova_elapsed += delta
-		if nova_bullets_remaining > 0:
-			_fire_nova_tick()
-		else:
+		while waves_spawned < wave_count and nova_elapsed >= float(waves_spawned) * wave_interval:
+			_spawn_wave(waves_spawned)
+			waves_spawned += 1
+		if waves_spawned >= wave_count:
 			nova_active = false
 
 	if charge > 0 and Input.is_action_just_pressed("super"):
@@ -50,9 +49,8 @@ func _unleash() -> void:
 	_clear_nearby(radius, damage)
 
 	nova_damage = damage
-	nova_bullets_spawned = 0
-	nova_bullets_remaining = bullet_count
 	nova_elapsed = 0.0
+	waves_spawned = 0
 	nova_active = true
 
 func _clear_nearby(radius: float, damage: int) -> void:
@@ -69,25 +67,17 @@ func _clear_nearby(radius: float, damage: int) -> void:
 		else:
 			target.queue_free()
 
-func _fire_nova_tick() -> void:
-	var single_target := get_tree().get_nodes_in_group("enemies").size() == 1
-	var count: int = min(bullets_per_tick, nova_bullets_remaining)
+func _spawn_wave(wave_index: int) -> void:
+	var angle_offset := (TAU / float(bullets_per_wave)) * float(wave_index) / float(wave_count)
 
-	for i in count:
-		var angle := (float(nova_bullets_spawned) / bullet_count) * TAU
+	for i in bullets_per_wave:
+		var angle := (float(i) / float(bullets_per_wave)) * TAU + angle_offset
 		var bullet := bullet_scene.instantiate() as Bullet
 		entity.get_parent().add_child(bullet)
 		bullet.direction = Vector2.RIGHT.rotated(angle)
 		bullet.speed = bullet_speed
-		bullet.global_position = entity.global_position + bullet.direction * bullet_speed * nova_elapsed
+		bullet.global_position = entity.global_position
 		bullet.damage = nova_damage
-		bullet.homing_delay = max(expand_duration - nova_elapsed, 0.0)
-		bullet.acquire_nearest_enemy = true
-		if single_target:
-			bullet.turn_rate = single_target_turn_rate
-		nova_bullets_spawned += 1
-
-	nova_bullets_remaining -= count
 
 func _spawn_blast(radius: float) -> void:
 	var blast := Polygon2D.new()
