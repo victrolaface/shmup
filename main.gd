@@ -74,6 +74,7 @@ func _ready() -> void:
 	sub_boss_bar.visible = false
 	_show_level_banner()
 	_set_spawn_interval_scale(LEVEL_1_1_INTERVAL_SCALE)
+	Conductor.start_song()
 
 func _set_spawn_interval_scale(interval_scale: float) -> void:
 	spawner.interval_scale = interval_scale
@@ -240,4 +241,4 @@ func _on_restart_pressed() -> void:
 	get_tree().reload_current_scene()
 
 func _on_close_pressed() -> void:
-	get_tree().quit()
+	Conductor.quit_game()

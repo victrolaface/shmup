@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://c8hy6hnxuok55" path="res://components/boss_animation_component.gd" id="7"]
 [ext_resource type="Script" uid="uid://bnl56a3gaq4yk" path="res://components/shooter_component.gd" id="8"]
 [ext_resource type="Script" path="res://components/overlap_damage_component.gd" id="20"]
+[ext_resource type="Script" path="res://components/danmaku_component.gd" id="21"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 324.0
@@ -296,10 +297,11 @@ burst_count = 4
 burst_pause = 1.5
 single_burst = true
 
+[node name="DanmakuComponent" type="Node" parent="."]
+script = ExtResource("21")
+preset = 0
+
 [node name="BossAnimationComponent" type="Node" parent="." unique_id=498097476]
 script = ExtResource("7")
 
-[connection signal="arrived" from="ApproachStopComponent" to="RadialShooter" method="start"]
-[connection signal="burst_finished" from="RadialShooter" to="FanShooter" method="start"]
-[connection signal="burst_finished" from="FanShooter" to="CurtainShooter" method="start"]
-[connection signal="burst_finished" from="CurtainShooter" to="RadialShooter" method="start"]
+[connection signal="arrived" from="ApproachStopComponent" to="DanmakuComponent" method="begin"]

@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://c8hy6hnxuok55" path="res://components/boss_animation_component.gd" id="7"]
 [ext_resource type="Script" uid="uid://bnl56a3gaq4yk" path="res://components/shooter_component.gd" id="8"]
 [ext_resource type="Script" path="res://components/overlap_damage_component.gd" id="20"]
+[ext_resource type="Script" path="res://components/danmaku_component.gd" id="21"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 250.0
@@ -273,10 +274,12 @@ ring_bullets = 24
 bullet_tint = Color(1, 0.85, 0.35, 1)
 animation_name = "attack_radial"
 
+[node name="DanmakuComponent" type="Node" parent="."]
+script = ExtResource("21")
+preset = 1
+palette = PackedColorArray(1, 0.55, 0.2, 1, 1, 0.85, 0.35, 1, 1, 0.3, 0.25, 1)
+
 [node name="BossAnimationComponent" type="Node" parent="." unique_id=1850902329]
 script = ExtResource("7")
 
-[connection signal="arrived" from="ApproachStopComponent" to="SpiralShooter" method="start"]
-[connection signal="burst_finished" from="SpiralShooter" to="FanShooter" method="start"]
-[connection signal="burst_finished" from="FanShooter" to="RingShooter" method="start"]
-[connection signal="burst_finished" from="RingShooter" to="SpiralShooter" method="start"]
+[connection signal="arrived" from="ApproachStopComponent" to="DanmakuComponent" method="begin"]

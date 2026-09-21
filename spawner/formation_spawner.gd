@@ -22,9 +22,9 @@ func _physics_process(delta: float) -> void:
 	time_since_squad += delta
 
 	var ramp_t: float = clamp(elapsed / ramp_duration, 0.0, 1.0)
-	var current_interval: float = lerp(squad_interval_start, squad_interval_min, ramp_t) * interval_scale
+	var current_interval: float = lerp(squad_interval_start, squad_interval_min, ramp_t) * interval_scale * Conductor.spawn_scale()
 
-	if time_since_squad >= current_interval:
+	if time_since_squad >= current_interval and Conductor.gate(4):
 		time_since_squad = 0.0
 		_spawn_squad()
 

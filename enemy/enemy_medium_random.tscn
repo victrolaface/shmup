@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://components/health_component.gd" id="1"]
 [ext_resource type="Script" path="res://components/hit_flash_component.gd" id="2"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" path="res://components/offscreen_cull_component.gd" id="6"]
 [ext_resource type="Script" path="res://components/approach_stop_component.gd" id="7"]
 [ext_resource type="Script" path="res://components/shooter_component.gd" id="8"]
+[ext_resource type="Script" path="res://components/danmaku_component.gd" id="21"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 44.0
@@ -56,6 +57,12 @@ hover_amplitude = 140.0
 hover_frequency = 0.7
 stay_duration = 18.0
 
+[node name="DanmakuComponent" type="Node" parent="."]
+script = ExtResource("21")
+preset = 2
+density_scale = 0.5
+start_on_screen = true
+
 [node name="ShooterComponent" type="Node" parent="."]
 script = ExtResource("8")
 mode = 4
@@ -68,3 +75,4 @@ wave_amplitude = 100.0
 wave_frequency = 5.0
 
 [connection signal="leaving" from="ApproachStopComponent" to="ShooterComponent" method="stop"]
+[connection signal="leaving" from="ApproachStopComponent" to="DanmakuComponent" method="stop"]

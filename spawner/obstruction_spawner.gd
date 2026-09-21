@@ -25,7 +25,7 @@ func _physics_process(delta: float) -> void:
 	if not spawning:
 		return
 	next_spawn_in -= delta
-	if next_spawn_in <= 0.0:
+	if next_spawn_in <= 0.0 and Conductor.gate(4):
 		_spawn_building()
 
 func _spawn_building() -> void:
@@ -35,7 +35,7 @@ func _spawn_building() -> void:
 	var roof_height := 0.0
 	if randf() < pitched_roof_chance:
 		roof_height = clampf(width * 0.3, pitched_roof_range.x, pitched_roof_range.y)
-	var gap := randf_range(gap_range.x, gap_range.y) * interval_scale
+	var gap := randf_range(gap_range.x, gap_range.y) * interval_scale * Conductor.obstruction_scale()
 	next_spawn_in = (width + gap) / scroll_speed
 
 	var center := Vector2(spawn_edge_x + width * 0.5, ground_y - height * 0.5)
