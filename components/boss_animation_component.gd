@@ -21,8 +21,11 @@ func _ready() -> void:
 
 	for child in entity.get_children():
 		var shooter := child as ShooterComponent
-		if shooter != null and SHOOTER_ANIMATIONS.has(shooter.mode):
-			shooter.burst_started.connect(_on_burst_started.bind(SHOOTER_ANIMATIONS[shooter.mode]))
+		if shooter == null:
+			continue
+		var animation: String = shooter.animation_name if shooter.animation_name != "" else SHOOTER_ANIMATIONS.get(shooter.mode, "")
+		if animation != "":
+			shooter.burst_started.connect(_on_burst_started.bind(animation))
 
 	var health := HealthComponent.find(entity)
 	health.damaged.connect(_on_damaged)

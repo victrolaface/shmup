@@ -1,0 +1,65 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://components/health_component.gd" id="1"]
+[ext_resource type="Script" path="res://components/hit_flash_component.gd" id="2"]
+[ext_resource type="Script" path="res://components/death_effects_component.gd" id="3"]
+[ext_resource type="Script" path="res://components/drop_component.gd" id="4"]
+[ext_resource type="Script" path="res://components/contact_damage_component.gd" id="5"]
+[ext_resource type="Script" path="res://components/offscreen_cull_component.gd" id="6"]
+[ext_resource type="Script" path="res://components/wave_move_component.gd" id="7"]
+[ext_resource type="Script" path="res://components/shooter_component.gd" id="8"]
+[ext_resource type="Script" path="res://components/perch_component.gd" id="9"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 16.0
+
+[node name="EnemyRooftopSniper" type="Area2D" groups=["enemies"]]
+collision_layer = 2
+collision_mask = 1
+monitoring = true
+monitorable = true
+
+[node name="Visual" type="Polygon2D" parent="."]
+color = Color(0.95, 0.6, 0.2, 1)
+polygon = PackedVector2Array(-14, 14, -14, -4, 0, -16, 14, -4, 14, 14)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_1")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("1")
+max_health = 1
+
+[node name="HitFlashComponent" type="Node" parent="."]
+script = ExtResource("2")
+
+[node name="DeathEffectsComponent" type="Node" parent="."]
+script = ExtResource("3")
+score_value = 15
+explosion_radius_range = Vector2(12, 22)
+explosion_duration = 0.22
+smoke_radius = 14.0
+
+[node name="DropComponent" type="Node" parent="."]
+script = ExtResource("4")
+
+[node name="ContactDamageComponent" type="Node" parent="."]
+script = ExtResource("5")
+
+[node name="OffscreenCullComponent" type="Node" parent="."]
+script = ExtResource("6")
+
+[node name="WaveMoveComponent" type="Node" parent="."]
+script = ExtResource("7")
+speed = 260.0
+
+[node name="PerchComponent" type="Node" parent="."]
+script = ExtResource("9")
+
+[node name="ShooterComponent" type="Node" parent="."]
+script = ExtResource("8")
+mode = 1
+bullet_speed = 600.0
+interval = 2.2
+autostart = false
+start_on_screen = true

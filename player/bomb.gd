@@ -19,8 +19,15 @@ func _physics_process(delta: float) -> void:
 	velocity.y += gravity * delta
 	position += velocity * delta
 
-	if global_position.x < -100.0 or global_position.y >= GROUND_Y or _near_ground_enemy():
+	if global_position.x < -100.0 or global_position.y >= GROUND_Y or _near_ground_enemy() or _hits_obstruction():
 		_explode()
+
+func _hits_obstruction() -> bool:
+	for node in get_tree().get_nodes_in_group("obstruction"):
+		var body := DestructibleBodyComponent.find(node)
+		if body != null and body.contains_global(global_position):
+			return true
+	return false
 
 func _near_ground_enemy() -> bool:
 	for node in get_tree().get_nodes_in_group("ground_enemies"):
@@ -38,6 +45,11 @@ func _explode() -> void:
 		var health := HealthComponent.find(target)
 		if health != null and global_position.distance_to(target.global_position) <= blast_radius:
 			health.take_damage(damage if target.is_in_group("ground_enemies") else air_damage)
+
+	for node in get_tree().get_nodes_in_group("obstruction"):
+		var body := DestructibleBodyComponent.find(node)
+		if body != null:
+			body.carve(global_position, blast_radius * 0.75, Vector2.UP)
 
 	var explosion := EXPLOSION_SCENE.instantiate() as Node2D
 	explosion.set("min_radius", blast_radius * 0.6)

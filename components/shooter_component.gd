@@ -16,8 +16,6 @@ const PATTERN_CONFIG := {
 }
 const FAN_BULLETS := 5
 const FAN_STEP_DEGREES := 12.5
-const RING_BULLETS := 18
-const SPIRAL_ARMS := 3
 const SPIRAL_STEP := 0.45
 
 @export var mode: Mode = Mode.FORWARD
@@ -37,6 +35,11 @@ const SPIRAL_STEP := 0.45
 @export var radial_colors: PackedColorArray = PackedColorArray([Color(0.45, 0.65, 1.0, 1.0), Color(0.85, 0.5, 1.0, 1.0)])
 @export var fan_bullets: int = 7
 @export var fan_angle_degrees: float = 120.0
+@export var forced_pattern: int = -1
+@export var spiral_arms: int = 3
+@export var ring_bullets: int = 18
+@export var bullet_tint: Color = Color(0, 0, 0, 0)
+@export var animation_name: String = ""
 @export var curtain_colors: PackedColorArray = PackedColorArray([Color(0.4, 0.65, 1.0, 1.0), Color(0.6, 0.4, 1.0, 1.0), Color(0.85, 0.4, 0.9, 1.0), Color(1.0, 0.3, 0.3, 1.0)])
 @export var curtain_spawn_offset_x: float = -100.0
 @export var curtain_dot_spacing: float = 62.0
@@ -67,7 +70,9 @@ func _ready() -> void:
 	active = autostart
 	burst_size = burst_count
 	shot_interval = interval
-	if mode == Mode.RANDOM and pick_pattern_once:
+	if mode == Mode.RANDOM and forced_pattern >= 0:
+		_apply_pattern(Pattern.values()[forced_pattern])
+	elif mode == Mode.RANDOM and pick_pattern_once:
 		_apply_pattern(Pattern.values().pick_random())
 	if active:
 		_begin_burst()
@@ -118,7 +123,10 @@ func _begin_burst() -> void:
 	shots_in_burst = 0
 	burst_number += 1
 	if mode == Mode.RANDOM:
-		_apply_pattern(pattern if pick_pattern_once else Pattern.values().pick_random())
+		if forced_pattern >= 0 or pick_pattern_once:
+			_apply_pattern(pattern)
+		else:
+			_apply_pattern(Pattern.values().pick_random())
 
 func _apply_pattern(new_pattern: Pattern) -> void:
 	pattern = new_pattern
@@ -159,14 +167,14 @@ func _fire_random_pattern() -> void:
 			for k in range(-(FAN_BULLETS / 2), FAN_BULLETS / 2 + 1):
 				_spawn_bullet(aim.rotated(deg_to_rad(FAN_STEP_DEGREES) * k))
 		Pattern.RING:
-			var offset := (TAU / RING_BULLETS) * 0.5 * float(shots_in_burst % 2)
-			for i in RING_BULLETS:
-				_spawn_bullet(Vector2.RIGHT.rotated(TAU * i / RING_BULLETS + offset))
+			var offset := (TAU / ring_bullets) * 0.5 * float(shots_in_burst % 2)
+			for i in ring_bullets:
+				_spawn_bullet(Vector2.RIGHT.rotated(TAU * i / ring_bullets + offset))
 		Pattern.WAVES:
 			_fire_waves()
 		Pattern.SPIRAL:
-			for arm in SPIRAL_ARMS:
-				_spawn_bullet(Vector2.RIGHT.rotated(spiral_angle + TAU * arm / SPIRAL_ARMS))
+			for arm in spiral_arms:
+				_spawn_bullet(Vector2.RIGHT.rotated(spiral_angle + TAU * arm / spiral_arms))
 			spiral_angle += SPIRAL_STEP
 		Pattern.STREAM:
 			_spawn_bullet(_aim_at_player())
@@ -214,7 +222,8 @@ func _spawn_bullet(direction: Vector2, amplitude: float = 0.0, frequency: float 
 	bullet.wave_amplitude = amplitude
 	bullet.wave_frequency = frequency
 	bullet.wave_phase = phase
-	if tint.a > 0.0:
-		(bullet.get_node("Visual") as Polygon2D).color = tint
+	var final_tint := tint if tint.a > 0.0 else bullet_tint
+	if final_tint.a > 0.0:
+		(bullet.get_node("Visual") as Polygon2D).color = final_tint
 	if dot_scale != 1.0:
 		bullet.scale = Vector2.ONE * dot_scale

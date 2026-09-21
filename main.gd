@@ -1,6 +1,9 @@
 extends Node2D
 
-const SUB_BOSS_SCENE := preload("res://sub_boss/sub_boss.tscn")
+const BOSS_SCENES: Array[PackedScene] = [
+	preload("res://sub_boss/sub_boss.tscn"),
+	preload("res://sub_boss/boss_two.tscn"),
+]
 const SUB_BOSS_BAR_WIDTH := 400.0
 const SUPER_BAR_WIDTH := 120.0
 const LEVEL_BANNER_DURATION := 2.0
@@ -22,6 +25,7 @@ const MAX_SHOP_PURCHASES := 2
 @onready var skip_boss_button: Button = $UI/SkipBossButton
 @onready var pause_label: Label = $UI/PauseLabel
 @onready var god_mode_label: Label = $UI/GodModeLabel
+@onready var god_mode_button: Button = $UI/GodModeButton
 @onready var level_label: Label = $UI/LevelLabel
 @onready var shop_menu: Control = $UI/ShopMenu
 @onready var shop_coins_label: Label = $UI/ShopMenu/CoinsLabel
@@ -41,6 +45,8 @@ const MAX_SHOP_PURCHASES := 2
 @onready var formation_spawner: FormationSpawner = $Entities/FormationSpawner
 @onready var ground_spawner: GroundSpawner = $Entities/GroundSpawner
 @onready var swarm_spawner: SwarmSpawner = $Entities/SwarmSpawner
+@onready var obstruction_spawner: ObstructionSpawner = $Entities/ObstructionSpawner
+@onready var ceiling_spawner: CeilingSpawner = $Entities/CeilingSpawner
 
 var is_paused: bool = false
 var is_game_over: bool = false
@@ -74,6 +80,8 @@ func _set_spawn_interval_scale(interval_scale: float) -> void:
 	formation_spawner.interval_scale = interval_scale
 	ground_spawner.interval_scale = interval_scale
 	swarm_spawner.interval_scale = interval_scale
+	obstruction_spawner.interval_scale = interval_scale
+	ceiling_spawner.interval_scale = interval_scale
 
 func _on_pause_input() -> void:
 	if is_game_over or shop_open:
@@ -109,8 +117,12 @@ func _on_health_changed(current: int, _maximum: int) -> void:
 	for i in health_hearts.get_child_count():
 		(health_hearts.get_child(i) as Polygon2D).color = HEART_FULL if i < current else HEART_EMPTY
 
+func _on_god_mode_button_pressed() -> void:
+	player.health.toggle_god_mode()
+
 func _on_god_mode_changed(active: bool) -> void:
 	god_mode_label.visible = active
+	god_mode_button.text = "GOD MODE: ON" if active else "GOD MODE: OFF"
 
 func _on_super_progress_changed(progress: float) -> void:
 	for i in super_bar_fills.size():
@@ -137,8 +149,10 @@ func _on_sub_boss_timer_timeout() -> void:
 	formation_spawner.stop_spawning()
 	ground_spawner.stop_spawning()
 	swarm_spawner.stop_spawning()
+	obstruction_spawner.stop_spawning()
+	ceiling_spawner.stop_spawning()
 
-	var sub_boss := SUB_BOSS_SCENE.instantiate() as Node2D
+	var sub_boss := BOSS_SCENES[(level_minor - 1) % BOSS_SCENES.size()].instantiate() as Node2D
 	sub_boss.position = Vector2(2900, 720)
 	entities.add_child(sub_boss)
 	var boss_health := HealthComponent.find(sub_boss)
@@ -209,6 +223,8 @@ func _start_next_level() -> void:
 	formation_spawner.resume_spawning()
 	ground_spawner.resume_spawning()
 	swarm_spawner.resume_spawning()
+	obstruction_spawner.resume_spawning()
+	ceiling_spawner.resume_spawning()
 	sub_boss_timer.start()
 
 func _on_game_over() -> void:

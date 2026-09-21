@@ -4,6 +4,7 @@ extends Area2D
 const WORLD_WIDTH := 2560.0
 const WORLD_HEIGHT := 1440.0
 const OFFSCREEN_MARGIN := 100.0
+const CHUNK_RADIUS_RANGE := Vector2(26.0, 42.0)
 
 @export var speed: float = 1200.0
 @export var damage: int = 1
@@ -48,4 +49,9 @@ func _on_area_entered(area: Area2D) -> void:
 	var health := HealthComponent.find(area)
 	if health != null:
 		health.take_damage(damage)
+		queue_free()
+	elif not enemy_owned and area.is_in_group("obstruction"):
+		var body := DestructibleBodyComponent.find(area)
+		if body != null:
+			body.carve(global_position, randf_range(CHUNK_RADIUS_RANGE.x, CHUNK_RADIUS_RANGE.y), -direction)
 		queue_free()

@@ -7,6 +7,8 @@
 [ext_resource type="Script" uid="uid://cscfan1k1awqf" path="res://spawner/ground_spawner.gd" id="5"]
 [ext_resource type="Script" uid="uid://6nlov38inxkn" path="res://pause_controller.gd" id="6"]
 [ext_resource type="Script" path="res://spawner/swarm_spawner.gd" id="7"]
+[ext_resource type="Script" path="res://spawner/obstruction_spawner.gd" id="8"]
+[ext_resource type="Script" path="res://spawner/ceiling_spawner.gd" id="9"]
 
 [node name="main" type="Node2D" unique_id=392794174]
 script = ExtResource("1")
@@ -27,6 +29,12 @@ script = ExtResource("5")
 
 [node name="SwarmSpawner" type="Node2D" parent="Entities"]
 script = ExtResource("7")
+
+[node name="ObstructionSpawner" type="Node2D" parent="Entities"]
+script = ExtResource("8")
+
+[node name="CeilingSpawner" type="Node2D" parent="Entities"]
+script = ExtResource("9")
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=950528685]
 
@@ -243,6 +251,16 @@ offset_bottom = 152.0
 theme_override_font_sizes/font_size = 32
 text = "SKIP TO BOSS"
 
+[node name="GodModeButton" type="Button" parent="UI"]
+process_mode = 3
+focus_mode = 0
+offset_left = 2216.0
+offset_top = 168.0
+offset_right = 2536.0
+offset_bottom = 224.0
+theme_override_font_sizes/font_size = 32
+text = "GOD MODE: OFF"
+
 [node name="SubBossBar" type="Node2D" parent="UI" unique_id=381582363]
 visible = false
 position = Vector2(1080, 40)
@@ -269,6 +287,7 @@ script = ExtResource("6")
 [connection signal="pressed" from="UI/CloseButton" to="." method="_on_close_pressed"]
 [connection signal="pressed" from="UI/WindowCloseButton" to="." method="_on_close_pressed"]
 [connection signal="pressed" from="UI/SkipBossButton" to="." method="_on_skip_boss_pressed"]
+[connection signal="pressed" from="UI/GodModeButton" to="." method="_on_god_mode_button_pressed"]
 [connection signal="pressed" from="UI/ShopMenu/Option0" to="." method="_on_shop_option_pressed" binds= [0]]
 [connection signal="pressed" from="UI/ShopMenu/Option1" to="." method="_on_shop_option_pressed" binds= [1]]
 [connection signal="pressed" from="UI/ShopMenu/Option2" to="." method="_on_shop_option_pressed" binds= [2]]

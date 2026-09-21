@@ -8,7 +8,3 @@ extends Area2D
 func _ready() -> void:
 	add_to_group("player")
 	health.died.connect(Game.player_died)
-
-func _physics_process(_delta: float) -> void:
-	if Input.is_action_just_pressed("god_mode"):
-		health.toggle_god_mode()
