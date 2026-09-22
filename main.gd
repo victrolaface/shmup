@@ -1,7 +1,7 @@
 extends Node2D
 
 const BOSS_SCENES: Array[PackedScene] = [
-	preload("res://sub_boss/sub_boss.tscn"),
+	preload("res://sub_boss/sub_boss_one.tscn"),
 	preload("res://sub_boss/boss_two.tscn"),
 	preload("res://sub_boss/boss_three.tscn"),
 ]
@@ -10,7 +10,7 @@ const SUPER_BAR_WIDTH := 120.0
 const LEVEL_BANNER_DURATION := 2.0
 const LEVEL_1_1_INTERVAL_SCALE := 2.2
 const FINAL_STAGE := 2
-const STAGE_INTERVAL_SCALE := {1: 1.0, 2: 0.92}
+const STAGE_INTERVAL_SCALE := {1: 1.15, 2: 1.05}
 const HEART_SCALE := 1.35
 const HEART_SPACING := 58.0
 const HEART_FULL := Color(1, 0.25, 0.35, 1)
@@ -18,10 +18,14 @@ const HEART_EMPTY := Color(0.25, 0.2, 0.25, 1)
 const SHOP_DELAY := 4.0
 const UPGRADE_COST := 10
 const MAX_SHOP_PURCHASES := 2
+const COMBO_BAR_WIDTH := 240.0
 
 @onready var score_label: Label = $UI/ScoreLabel
 @onready var health_hearts: Node2D = $UI/HealthHearts
 @onready var currency_label: Label = $UI/CurrencyLabel
+@onready var combo_label: Label = $UI/ComboLabel
+@onready var combo_bar_bg: ColorRect = $UI/ComboBarBg
+@onready var combo_bar_fill: ColorRect = $UI/ComboBarBg/ComboBarFill
 @onready var game_over_label: Label = $UI/GameOverLabel
 @onready var restart_button: Button = $UI/RestartButton
 @onready var close_button: Button = $UI/CloseButton
@@ -42,6 +46,7 @@ const MAX_SHOP_PURCHASES := 2
 @onready var sub_boss_bar: Node2D = $UI/SubBossBar
 @onready var sub_boss_bar_fill: ColorRect = $UI/SubBossBar/Fill
 @onready var sub_boss_timer: Timer = $SubBossTimer
+@onready var camera: ScreenShakeCamera = $Camera2D
 @onready var player: Player = $Entities/Player
 @onready var entities: Node2D = $Entities
 @onready var spawner: Spawner = $Entities/Spawner
@@ -63,6 +68,7 @@ var level_minor: int = 1
 func _ready() -> void:
 	Game.score_changed.connect(_on_score_changed)
 	Game.currency_changed.connect(_on_currency_changed)
+	Game.combo_changed.connect(_on_combo_changed)
 	Game.game_over.connect(_on_game_over)
 	Game.reset()
 
@@ -102,6 +108,22 @@ func _on_score_changed(new_score: int) -> void:
 
 func _on_currency_changed(new_currency: int) -> void:
 	currency_label.text = "%d" % new_currency
+
+func _process(_delta: float) -> void:
+	if Game.combo >= 2:
+		combo_bar_fill.size.x = COMBO_BAR_WIDTH * clampf(Game.combo_timer / Game.COMBO_WINDOW, 0.0, 1.0)
+
+func _on_combo_changed(combo: int, multiplier: float) -> void:
+	var visible_now := combo >= 2
+	combo_label.visible = visible_now
+	combo_bar_bg.visible = visible_now
+	if not visible_now:
+		return
+	combo_label.text = "COMBO x%d  (+%d%%)" % [combo, roundi((multiplier - 1.0) * 100.0)]
+	combo_bar_fill.size.x = COMBO_BAR_WIDTH
+	var tween := create_tween()
+	combo_label.scale = Vector2.ONE * 1.35
+	tween.tween_property(combo_label, "scale", Vector2.ONE, 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 func _build_health_hearts(count: int) -> void:
 	var points := PackedVector2Array()
@@ -170,6 +192,7 @@ func _on_sub_boss_health_changed(current: int, max_health: int) -> void:
 	sub_boss_bar_fill.size.x = SUB_BOSS_BAR_WIDTH * (float(current) / float(max_health))
 
 func _on_sub_boss_defeated() -> void:
+	camera.shake(1.0)
 	sub_boss_bar.visible = false
 	await get_tree().create_timer(SHOP_DELAY).timeout
 	if is_game_over:

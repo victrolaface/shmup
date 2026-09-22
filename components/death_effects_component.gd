@@ -15,7 +15,7 @@ func _ready() -> void:
 	HealthComponent.find(entity).died.connect(_on_died)
 
 func _on_died() -> void:
-	Game.add_score(score_value)
+	Game.register_kill(score_value)
 	var parent := entity.get_parent()
 	if spawn_explosion:
 		var explosion := EXPLOSION_SCENE.instantiate() as Node2D

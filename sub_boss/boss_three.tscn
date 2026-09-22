@@ -23,6 +23,13 @@ polygon = PackedVector2Array(270, 0, 191, 191, 0, 270, -191, 191, -270, 0, -191,
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_1")
 
+[node name="HurtBox" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 1
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
+
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 
 [node name="OverlapDamageComponent" type="Node" parent="."]
@@ -33,7 +40,7 @@ script = ExtResource("22")
 
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("1")
-max_health = 2800
+max_health = 2300
 free_on_death = false
 
 [node name="HitFlashComponent" type="Node" parent="."]
@@ -68,6 +75,6 @@ script = ExtResource("7")
 [node name="DanmakuComponent" type="Node" parent="."]
 script = ExtResource("21")
 preset = 3
-bullet_cap = 1400
+bullet_cap = 1100
 
 [connection signal="arrived" from="ApproachStopComponent" to="DanmakuComponent" method="begin"]

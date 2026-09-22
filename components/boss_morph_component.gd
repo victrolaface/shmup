@@ -12,6 +12,7 @@ const EXPLOSION_SCENE := preload("res://effects/explosion.tscn")
 @export var bullet_speed_range: Vector2 = Vector2(0.85, 1.3)
 @export var spin_range: Vector2 = Vector2(0.1, 0.5)
 @export var death_explosions: int = 14
+@export var hurt_box_scale: float = 0.55
 
 var visual: Polygon2D
 var spin: float = 0.0
@@ -57,6 +58,12 @@ func _randomize_shape() -> void:
 	var circle := CircleShape2D.new()
 	circle.radius = farthest * 0.85
 	hitbox.shape = circle
+
+	var hurt_box := entity.get_node("HurtBox/CollisionShape2D") as CollisionShape2D
+	var hurt_circle := CircleShape2D.new()
+	hurt_circle.radius = circle.radius * hurt_box_scale
+	hurt_box.shape = hurt_circle
+
 	spin = randf_range(spin_range.x, spin_range.y) * (1.0 if randf() < 0.5 else -1.0)
 
 func _randomize_movement() -> void:

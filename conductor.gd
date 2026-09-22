@@ -11,9 +11,9 @@ const TRACKS := {
 }
 const FALLBACK_BPM := 113.5
 const METRONOME_BEATS := 4000
-const SPAWN_SCALE := [1.5, 1.0, 0.7]
-const OBSTRUCTION_SCALE := [1.3, 1.0, 0.8]
-const BULLET_DENSITY := [0.7, 1.0, 1.45]
+const SPAWN_SCALE := [1.9, 1.3, 0.95]
+const OBSTRUCTION_SCALE := [1.6, 1.3, 1.0]
+const BULLET_DENSITY := [0.55, 0.8, 1.1]
 
 var running: bool = false
 var has_song: bool = false

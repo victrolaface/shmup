@@ -23,7 +23,7 @@ const DEFAULT_ANIMATIONS := {
 @export var preset: Preset = Preset.BOSS_ONE
 @export var density_scale: float = 1.0
 @export var speed_scale: float = 1.0
-@export var bullet_cap: int = 1000
+@export var bullet_cap: int = 800
 @export var start_on_screen: bool = false
 @export var palette: PackedColorArray = PackedColorArray([Color(1.0, 0.35, 0.6, 1.0), Color(0.65, 0.5, 1.0, 1.0), Color(0.4, 0.85, 1.0, 1.0)])
 

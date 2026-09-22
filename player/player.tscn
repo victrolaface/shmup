@@ -1,68 +1,153 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene format=3 uid="uid://bsveceqfddnt0"]
 
-[ext_resource type="Script" path="res://player/player.gd" id="1"]
-[ext_resource type="Script" path="res://components/health_component.gd" id="2"]
-[ext_resource type="Script" path="res://components/invincibility_blink_component.gd" id="3"]
-[ext_resource type="Script" path="res://components/player_move_component.gd" id="4"]
-[ext_resource type="Script" path="res://components/weapon_component.gd" id="5"]
-[ext_resource type="Script" path="res://components/bomb_component.gd" id="6"]
-[ext_resource type="Script" path="res://components/super_component.gd" id="7"]
-[ext_resource type="Script" path="res://components/inhale_component.gd" id="8"]
-[ext_resource type="Script" path="res://components/upgrade_component.gd" id="9"]
-[ext_resource type="Script" path="res://components/bombardment_component.gd" id="10"]
-[ext_resource type="Script" path="res://components/sfx_component.gd" id="11"]
-[ext_resource type="AudioStream" path="res://audio/player_shot.ogg" id="12"]
+[ext_resource type="Script" uid="uid://bqvmwcd8d5h37" path="res://player/player.gd" id="1"]
+[ext_resource type="Script" uid="uid://bpaqbwhvxyci1" path="res://components/health_component.gd" id="2"]
+[ext_resource type="Script" uid="uid://gknqri8wr2y7" path="res://components/invincibility_blink_component.gd" id="3"]
+[ext_resource type="Script" uid="uid://cdgyasnxd5ul5" path="res://components/player_move_component.gd" id="4"]
+[ext_resource type="Script" uid="uid://eniflwp4lcvr" path="res://components/weapon_component.gd" id="5"]
+[ext_resource type="Script" uid="uid://b2gdf04p5lyjs" path="res://components/bomb_component.gd" id="6"]
+[ext_resource type="Script" uid="uid://c7ys60cfvtsmb" path="res://components/super_component.gd" id="7"]
+[ext_resource type="Script" uid="uid://dfhavtn4sj2fc" path="res://components/inhale_component.gd" id="8"]
+[ext_resource type="Script" uid="uid://blhpcmgd1jeq8" path="res://components/upgrade_component.gd" id="9"]
+[ext_resource type="Script" uid="uid://cguofl65f5jxn" path="res://components/bombardment_component.gd" id="10"]
+[ext_resource type="Script" uid="uid://casre5ttonpx3" path="res://components/sfx_component.gd" id="11"]
+[ext_resource type="AudioStream" uid="uid://so0yvsx3shhn" path="res://audio/player_shot.ogg" id="12"]
+[ext_resource type="Script" uid="uid://b638fpvm1m5nh" path="res://components/player_animation_component.gd" id="13"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 24.0
 
-[node name="Player" type="Area2D"]
-collision_layer = 1
+[sub_resource type="Animation" id="Animation_death"]
+resource_name = "death"
+length = 1.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Visual:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.33, 1.1),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(1.3, 1.3), Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Visual:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1.1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 9.42478]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Visual:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.55, 1.1),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_hit"]
+resource_name = "hit"
+length = 0.18
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Visual:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.18),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(1.18, 1.18), Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_idle"]
+resource_name = "idle"
+length = 1.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Visual:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.8, 1.6),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(1.04, 1.04), Vector2(1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_player"]
+_data = {
+&"death": SubResource("Animation_death"),
+&"hit": SubResource("Animation_hit"),
+&"idle": SubResource("Animation_idle")
+}
+
+[node name="Player" type="Area2D" unique_id=812257637]
 collision_mask = 2
-monitoring = true
-monitorable = true
 script = ExtResource("1")
 
-[node name="Visual" type="Polygon2D" parent="."]
+[node name="Visual" type="Polygon2D" parent="." unique_id=1231266568]
 color = Color(0.3, 0.8, 1, 1)
 polygon = PackedVector2Array(28, 0, -20, -20, -10, 0, -20, 20)
+uv = PackedVector2Array(28, 0, -20, -20, -10, 0, -20, 20)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=656952921]
 shape = SubResource("CircleShape2D_1")
 
-[node name="InhaleIndicator" type="Polygon2D" parent="."]
+[node name="InhaleIndicator" type="Polygon2D" parent="." unique_id=777482674]
 z_index = -1
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=448475758]
 script = ExtResource("2")
-max_health = 3
-invincibility_duration = 1.6
+invincibility_duration = 2.0
+free_on_death = false
 
-[node name="InvincibilityBlinkComponent" type="Node" parent="."]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=219556811]
+libraries/ = SubResource("AnimationLibrary_player")
+
+[node name="PlayerAnimationComponent" type="Node" parent="." unique_id=1391237006]
+script = ExtResource("13")
+
+[node name="InvincibilityBlinkComponent" type="Node" parent="." unique_id=1300832867]
 script = ExtResource("3")
 
-[node name="PlayerMoveComponent" type="Node" parent="."]
+[node name="PlayerMoveComponent" type="Node" parent="." unique_id=1636506075]
 script = ExtResource("4")
 
-[node name="WeaponComponent" type="Node" parent="."]
+[node name="WeaponComponent" type="Node" parent="." unique_id=1908966280]
 script = ExtResource("5")
 
-[node name="ShotSfxComponent" type="Node" parent="."]
+[node name="ShotSfxComponent" type="Node" parent="." unique_id=1343236944]
 script = ExtResource("11")
 stream = ExtResource("12")
 volume_db = -12.0
 
-[node name="BombComponent" type="Node" parent="."]
+[node name="BombComponent" type="Node" parent="." unique_id=206168078]
 script = ExtResource("6")
 
-[node name="SuperComponent" type="Node" parent="."]
+[node name="SuperComponent" type="Node" parent="." unique_id=1877349963]
 script = ExtResource("7")
 
-[node name="InhaleComponent" type="Node" parent="."]
+[node name="InhaleComponent" type="Node" parent="." unique_id=1019729607]
 script = ExtResource("8")
 
-[node name="UpgradeComponent" type="Node" parent="."]
+[node name="UpgradeComponent" type="Node" parent="." unique_id=1956961526]
 script = ExtResource("9")
 
-[node name="BombardmentComponent" type="Node" parent="."]
+[node name="BombardmentComponent" type="Node" parent="." unique_id=782618071]
 script = ExtResource("10")

@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://cq4o4p650u3bp"]
+[gd_scene format=3 uid="uid://boq2hjeoayi52"]
 
 [ext_resource type="Script" uid="uid://bpaqbwhvxyci1" path="res://components/health_component.gd" id="1"]
 [ext_resource type="Script" uid="uid://qd00g4a3rxcv" path="res://components/hit_flash_component.gd" id="2"]
@@ -7,11 +7,14 @@
 [ext_resource type="Script" uid="uid://dlgmneil1m37o" path="res://components/approach_stop_component.gd" id="5"]
 [ext_resource type="Script" uid="uid://c8hy6hnxuok55" path="res://components/boss_animation_component.gd" id="7"]
 [ext_resource type="Script" uid="uid://bnl56a3gaq4yk" path="res://components/shooter_component.gd" id="8"]
-[ext_resource type="Script" path="res://components/overlap_damage_component.gd" id="20"]
-[ext_resource type="Script" path="res://components/danmaku_component.gd" id="21"]
+[ext_resource type="Script" uid="uid://thinpjiaj75l" path="res://components/overlap_damage_component.gd" id="20"]
+[ext_resource type="Script" uid="uid://crr76ynldm2j4" path="res://components/danmaku_component.gd" id="21"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 324.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hurt"]
+radius = 180.0
 
 [sub_resource type="Animation" id="Animation_attack_homing_cone"]
 resource_name = "attack_homing_cone"
@@ -231,15 +234,22 @@ polygon = PackedVector2Array(-324, -252, 216, -324, 324, 0, 216, 324, -324, 252,
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1158627178]
 shape = SubResource("CircleShape2D_1")
 
+[node name="HurtBox" type="Area2D" parent="." unique_id=1521680932]
+collision_layer = 0
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox" unique_id=829575930]
+shape = SubResource("CircleShape2D_hurt")
+
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=2079571403]
 libraries/ = SubResource("AnimationLibrary_boss")
 
-[node name="OverlapDamageComponent" type="Node" parent="."]
+[node name="OverlapDamageComponent" type="Node" parent="." unique_id=85483223]
 script = ExtResource("20")
 
 [node name="HealthComponent" type="Node" parent="." unique_id=1340149171]
 script = ExtResource("1")
-max_health = 1800
+max_health = 1450
 free_on_death = false
 
 [node name="HitFlashComponent" type="Node" parent="." unique_id=500998656]
@@ -297,9 +307,8 @@ burst_count = 4
 burst_pause = 1.5
 single_burst = true
 
-[node name="DanmakuComponent" type="Node" parent="."]
+[node name="DanmakuComponent" type="Node" parent="." unique_id=1254368005]
 script = ExtResource("21")
-preset = 0
 
 [node name="BossAnimationComponent" type="Node" parent="." unique_id=498097476]
 script = ExtResource("7")
