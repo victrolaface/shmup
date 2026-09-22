@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dbhunjjls6w05"
+path="res://.godot/imported/voide - robin.mp3-f8758b77507219726095674c7bb1c09f.mp3str"
+
+[deps]
+
+source_file="res://audio/voide - robin.mp3"
+dest_files=["res://.godot/imported/voide - robin.mp3-f8758b77507219726095674c7bb1c09f.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

@@ -5,7 +5,7 @@ signal currency_changed(new_currency: int)
 signal combo_changed(combo: int, multiplier: float)
 signal game_over
 
-const COMBO_WINDOW := 5.0
+const COMBO_WINDOW := 12.0
 const COMBO_MULTIPLIER_STEP := 0.1
 const COMBO_MAX_STEPS := 20
 

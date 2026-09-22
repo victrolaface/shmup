@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://cv4ju1eq2ovq6"
+path="res://.godot/imported/Databend - Energetic Jungle Breakbeat Drum & Bass.mp3-73620b4d84faa7113ef61be693979438.mp3str"
+
+[deps]
+
+source_file="res://audio/Databend - Energetic Jungle Breakbeat Drum & Bass.mp3"
+dest_files=["res://.godot/imported/Databend - Energetic Jungle Breakbeat Drum & Bass.mp3-73620b4d84faa7113ef61be693979438.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

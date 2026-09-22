@@ -1,7 +1,7 @@
 class_name DanmakuComponent
 extends Component
 
-enum Pattern { SPIRAL_BLOOM, RING_PULSE, AIMED_FANS, WALL_GAP, CROSS_SPIRALS, PETAL_BURST, SHOOTER, STARBURST_LINES, SNAKE_LINES, BRAID_LINES, GRID_LINES, POLYGON_WAVES }
+enum Pattern { SPIRAL_BLOOM, RING_PULSE, AIMED_FANS, WALL_GAP, CROSS_SPIRALS, PETAL_BURST, SHOOTER, STARBURST_LINES, SNAKE_LINES, BRAID_LINES, GRID_LINES, POLYGON_WAVES, PINWHEEL_BLADES, COMET_RAIN, SCISSOR_CROSS, DIAMOND_LATTICE, TWIN_VORTEX }
 enum Preset { BOSS_ONE, BOSS_TWO, MEDIUM, BOSS_THREE }
 
 const BULLET_SCENE := preload("res://bullet/bullet_enemy.tscn")
@@ -18,6 +18,11 @@ const DEFAULT_ANIMATIONS := {
 	Pattern.BRAID_LINES: "attack_surround_stream",
 	Pattern.SNAKE_LINES: "attack_homing_cone",
 	Pattern.GRID_LINES: "attack_horizontal_line",
+	Pattern.PINWHEEL_BLADES: "attack_surround_stream",
+	Pattern.COMET_RAIN: "attack_horizontal_line",
+	Pattern.SCISSOR_CROSS: "attack_homing_cone",
+	Pattern.DIAMOND_LATTICE: "attack_horizontal_line",
+	Pattern.TWIN_VORTEX: "attack_surround_stream",
 }
 
 @export var preset: Preset = Preset.BOSS_ONE
@@ -75,8 +80,10 @@ func _build_program() -> void:
 				_step(Pattern.SPIRAL_BLOOM, 4),
 				_shooter("RadialShooter", 1, 4, 14),
 				_step(Pattern.AIMED_FANS, 4),
+				_step(Pattern.PINWHEEL_BLADES, 3),
 				_shooter("FanShooter", 2, 2, 15),
 				_step(Pattern.WALL_GAP, 4),
+				_step(Pattern.SCISSOR_CROSS, 3),
 				_step(Pattern.RING_PULSE, 3),
 				_shooter("CurtainShooter", 2, 1, 7),
 				_step(Pattern.CROSS_SPIRALS, 4),
@@ -87,26 +94,31 @@ func _build_program() -> void:
 				_step(Pattern.PETAL_BURST, 4),
 				_shooter("SpiralShooter", 1, 4, 14),
 				_step(Pattern.CROSS_SPIRALS, 4),
+				_step(Pattern.COMET_RAIN, 3),
 				_shooter("FanShooter", 2, 2, 15),
 				_step(Pattern.RING_PULSE, 3),
+				_step(Pattern.TWIN_VORTEX, 3),
 				_step(Pattern.WALL_GAP, 4),
 				_shooter("RingShooter", 2, 1, 7),
 				_step(Pattern.SPIRAL_BLOOM, 4),
 				_step(Pattern.AIMED_FANS, 4),
 			]
 		Preset.MEDIUM:
-			program = [_step(Pattern.RING_PULSE, 2), _step(Pattern.AIMED_FANS, 2)]
+			program = [_step(Pattern.RING_PULSE, 2), _step(Pattern.AIMED_FANS, 2), _step(Pattern.PINWHEEL_BLADES, 2)]
 		Preset.BOSS_THREE:
 			program = [
 				_step(Pattern.STARBURST_LINES, 4),
 				_step(Pattern.POLYGON_WAVES, 4),
 				_step(Pattern.BRAID_LINES, 4),
+				_step(Pattern.DIAMOND_LATTICE, 4),
 				_step(Pattern.GRID_LINES, 4),
 				_step(Pattern.SNAKE_LINES, 4),
 				_combo(Pattern.STARBURST_LINES, Pattern.SPIRAL_BLOOM, 4),
+				_step(Pattern.COMET_RAIN, 4),
 				_step(Pattern.POLYGON_WAVES, 4),
 				_combo(Pattern.BRAID_LINES, Pattern.GRID_LINES, 4),
 				_combo(Pattern.SNAKE_LINES, Pattern.POLYGON_WAVES, 4),
+				_combo(Pattern.DIAMOND_LATTICE, Pattern.TWIN_VORTEX, 4),
 			]
 
 func _can_run() -> bool:
@@ -191,6 +203,16 @@ func _run_pattern(pattern: int, step: int, bar: int) -> void:
 			_grid_lines(step)
 		Pattern.POLYGON_WAVES:
 			_polygon_waves(step, bar)
+		Pattern.PINWHEEL_BLADES:
+			_pinwheel_blades(step, bar)
+		Pattern.COMET_RAIN:
+			_comet_rain(step, bar)
+		Pattern.SCISSOR_CROSS:
+			_scissor_cross(step)
+		Pattern.DIAMOND_LATTICE:
+			_diamond_lattice(step)
+		Pattern.TWIN_VORTEX:
+			_twin_vortex(step, bar)
 
 func _aim() -> Vector2:
 	var target := get_tree().get_first_node_in_group("player") as Node2D
@@ -351,3 +373,67 @@ func _polygon_waves(step: int, bar: int) -> void:
 			for j in 10:
 				var offset := from_vertex.lerp(to_vertex, float(j) / 10.0)
 				_fire(offset.normalized(), speed, tint, 1.0, center + offset)
+
+func _pinwheel_blades(step: int, bar: int) -> void:
+	if step % 2 != 0:
+		return
+	var blades := clampi(roundi(4.0 * _density()), 3, 7)
+	var blade_width := 5
+	var spin := float(counter) * 0.12 + float(bar) * 0.3
+	for b in blades:
+		var blade_angle := spin + TAU * float(b) / float(blades)
+		var tint := _tint(b)
+		for k in blade_width:
+			var offset := (float(k) / float(blade_width - 1) - 0.5) * 0.35
+			_fire(Vector2.from_angle(blade_angle + offset), 260.0 + float(k) * 20.0, tint)
+
+func _comet_rain(step: int, bar: int) -> void:
+	if step % 4 != 0:
+		return
+	var columns := clampi(roundi(6.0 * _density()), 4, 10)
+	var phase := float(bar) * 0.6 + float(step >> 2) * 0.4
+	for c in columns:
+		var x := 200.0 + 2160.0 * float(c) / float(columns - 1) + 80.0 * sin(phase + float(c) * 0.9)
+		_fire(Vector2.DOWN, 260.0, _tint(c), 1.0, Vector2(x, -20.0), 40.0, 3.0, float(c) * 0.5)
+
+func _scissor_cross(step: int) -> void:
+	if step % 3 != 0:
+		return
+	var aim := _aim()
+	var sweep := sin(float(counter) * 0.15) * 0.6
+	var count := clampi(roundi(6.0 * _density()), 4, 10)
+	for k in count:
+		var t := float(k) / float(count - 1) - 0.5
+		_fire(aim.rotated(sweep + t * 0.5), 320.0, _tint(0))
+		_fire(aim.rotated(-sweep - t * 0.5), 320.0, _tint(1))
+
+func _diamond_lattice(step: int) -> void:
+	if step % 4 != 0:
+		return
+	gap_phase += 0.6
+	var gap_pos := 720.0 + 420.0 * sin(gap_phase)
+	var rising := (step >> 2) % 2 == 0
+	var dir := Vector2(-1.0, 1.0).normalized() if rising else Vector2(-1.0, -1.0).normalized()
+	var perpendicular := Vector2(1.0, 1.0).normalized() if rising else Vector2(1.0, -1.0).normalized()
+	var count := 26
+	var spacing := 66.0
+	var tint := _tint(1 if rising else 2)
+	for i in count:
+		var offset := (float(i) - float(count - 1) * 0.5) * spacing
+		var pos := Vector2(1280.0, 720.0) + perpendicular * offset
+		if absf(pos.y - gap_pos) > 210.0:
+			_fire(dir, 280.0, tint, 1.0, pos)
+
+func _twin_vortex(step: int, bar: int) -> void:
+	if step % 2 != 0:
+		return
+	var arms := clampi(roundi(3.0 * _density()), 2, 5)
+	var angle := float(counter) * 0.22
+	var offset := 130.0
+	var centers := [entity.global_position + Vector2(0.0, -offset), entity.global_position + Vector2(0.0, offset)]
+	for c in 2:
+		var spin_dir := 1.0 if c == 0 else -1.0
+		var tint := _tint(c)
+		for i in arms:
+			var a := angle * spin_dir + TAU * float(i) / float(arms)
+			_fire(Vector2.from_angle(a), 280.0, tint, 1.0, centers[c])

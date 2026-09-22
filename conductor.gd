@@ -6,8 +6,8 @@ signal bar_started(bar: int)
 signal section_changed(new_intensity: int)
 
 const TRACKS := {
-	1: {"song": "res://voide - robin.mp3", "map": "res://music/voide_robin_map.json"},
-	2: {"song": "res://Databend - Energetic Jungle Breakbeat Drum & Bass.mp3", "map": "res://music/databend_map.json"},
+	1: {"song": "res://audio/voide - robin.mp3", "map": "res://music/voide_robin_map.json"},
+	2: {"song": "res://audio/Databend - Energetic Jungle Breakbeat Drum & Bass.mp3", "map": "res://music/databend_map.json"},
 }
 const FALLBACK_BPM := 113.5
 const METRONOME_BEATS := 4000
