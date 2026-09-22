@@ -3,11 +3,14 @@ extends Node2D
 const BOSS_SCENES: Array[PackedScene] = [
 	preload("res://sub_boss/sub_boss.tscn"),
 	preload("res://sub_boss/boss_two.tscn"),
+	preload("res://sub_boss/boss_three.tscn"),
 ]
 const SUB_BOSS_BAR_WIDTH := 400.0
 const SUPER_BAR_WIDTH := 120.0
 const LEVEL_BANNER_DURATION := 2.0
 const LEVEL_1_1_INTERVAL_SCALE := 2.2
+const FINAL_STAGE := 2
+const STAGE_INTERVAL_SCALE := {1: 1.0, 2: 0.92}
 const HEART_SCALE := 1.35
 const HEART_SPACING := 58.0
 const HEART_FULL := Color(1, 0.25, 0.35, 1)
@@ -153,7 +156,7 @@ func _on_sub_boss_timer_timeout() -> void:
 	obstruction_spawner.stop_spawning()
 	ceiling_spawner.stop_spawning()
 
-	var sub_boss := BOSS_SCENES[(level_minor - 1) % BOSS_SCENES.size()].instantiate() as Node2D
+	var sub_boss := BOSS_SCENES[mini(level_minor, BOSS_SCENES.size()) - 1].instantiate() as Node2D
 	sub_boss.position = Vector2(2900, 720)
 	entities.add_child(sub_boss)
 	var boss_health := HealthComponent.find(sub_boss)
@@ -171,7 +174,18 @@ func _on_sub_boss_defeated() -> void:
 	await get_tree().create_timer(SHOP_DELAY).timeout
 	if is_game_over:
 		return
+	if level_minor >= BOSS_SCENES.size() and level_major >= FINAL_STAGE:
+		_show_stage_clear()
+		return
 	_open_shop()
+
+func _show_stage_clear() -> void:
+	is_game_over = true
+	game_over_label.text = "GAME CLEAR!"
+	game_over_label.visible = true
+	restart_button.visible = true
+	close_button.visible = true
+	get_tree().paused = true
 
 func _open_shop() -> void:
 	shop_open = true
@@ -217,8 +231,13 @@ func _start_next_level() -> void:
 	boss_active = false
 	skip_boss_button.visible = true
 	level_minor += 1
+	if level_minor > BOSS_SCENES.size():
+		level_major += 1
+		level_minor = 1
+		Conductor.use_track(level_major)
+		Conductor.start_song()
 	_show_level_banner()
-	_set_spawn_interval_scale(1.0)
+	_set_spawn_interval_scale(STAGE_INTERVAL_SCALE.get(level_major, STAGE_INTERVAL_SCALE[FINAL_STAGE]))
 
 	spawner.resume_spawning()
 	formation_spawner.resume_spawning()

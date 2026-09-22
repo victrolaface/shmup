@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://player/player.gd" id="1"]
 [ext_resource type="Script" path="res://components/health_component.gd" id="2"]
@@ -10,6 +10,8 @@
 [ext_resource type="Script" path="res://components/inhale_component.gd" id="8"]
 [ext_resource type="Script" path="res://components/upgrade_component.gd" id="9"]
 [ext_resource type="Script" path="res://components/bombardment_component.gd" id="10"]
+[ext_resource type="Script" path="res://components/sfx_component.gd" id="11"]
+[ext_resource type="AudioStream" path="res://audio/player_shot.ogg" id="12"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 24.0
@@ -44,6 +46,11 @@ script = ExtResource("4")
 
 [node name="WeaponComponent" type="Node" parent="."]
 script = ExtResource("5")
+
+[node name="ShotSfxComponent" type="Node" parent="."]
+script = ExtResource("11")
+stream = ExtResource("12")
+volume_db = -12.0
 
 [node name="BombComponent" type="Node" parent="."]
 script = ExtResource("6")

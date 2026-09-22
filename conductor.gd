@@ -5,8 +5,10 @@ signal beat(beat_in_bar: int, bar: int)
 signal bar_started(bar: int)
 signal section_changed(new_intensity: int)
 
-const SONG_PATH := "res://voide - robin.mp3"
-const MAP_PATH := "res://music/voide_robin_map.json"
+const TRACKS := {
+	1: {"song": "res://voide - robin.mp3", "map": "res://music/voide_robin_map.json"},
+	2: {"song": "res://Databend - Energetic Jungle Breakbeat Drum & Bass.mp3", "map": "res://music/databend_map.json"},
+}
 const FALLBACK_BPM := 113.5
 const METRONOME_BEATS := 4000
 const SPAWN_SCALE := [1.5, 1.0, 0.7]
@@ -25,6 +27,7 @@ var beats: Array[float] = []
 var downbeat_phase: int = 0
 var sections: Array = []
 var player: AudioStreamPlayer
+var current_track: int = 1
 
 var use_audio: bool = true
 var _quitting: bool = false
@@ -38,7 +41,7 @@ func _ready() -> void:
 	player = AudioStreamPlayer.new()
 	player.volume_db = music_volume_db
 	add_child(player)
-	_load_song()
+	_load_song(current_track)
 	if not has_song:
 		_build_metronome()
 
@@ -56,11 +59,26 @@ func quit_game() -> void:
 	player.stream = null
 	get_tree().quit()
 
-func _load_song() -> void:
-	if not ResourceLoader.exists(SONG_PATH) or not ResourceLoader.exists(MAP_PATH):
+func use_track(stage: int) -> void:
+	if not TRACKS.has(stage) or stage == current_track:
 		return
-	var stream := load(SONG_PATH) as AudioStreamMP3
-	var map_resource := load(MAP_PATH) as JSON
+	current_track = stage
+	has_song = false
+	beats.clear()
+	downbeat_phase = 0
+	sections = []
+	_load_song(stage)
+	if not has_song:
+		_build_metronome()
+
+func _load_song(stage: int) -> void:
+	var paths: Dictionary = TRACKS.get(stage, {})
+	var song_path: String = paths.get("song", "")
+	var map_path: String = paths.get("map", "")
+	if song_path == "" or not ResourceLoader.exists(song_path) or not ResourceLoader.exists(map_path):
+		return
+	var stream := load(song_path) as AudioStreamMP3
+	var map_resource := load(map_path) as JSON
 	if stream == null or map_resource == null:
 		return
 	var map: Dictionary = map_resource.data

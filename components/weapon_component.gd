@@ -16,6 +16,10 @@ var shot_rows: int = 2
 var diagonal_level: int = 0
 var cooldown: float = 0.0
 var rate_multiplier: float = 1.0
+var sfx: SfxComponent
+
+func _ready() -> void:
+	sfx = Component.of(entity, "ShotSfxComponent") as SfxComponent
 
 func _physics_process(delta: float) -> void:
 	rate_multiplier = _proximity_multiplier()
@@ -50,6 +54,8 @@ func _enemy_radius(enemy: Node2D) -> float:
 
 func _fire() -> void:
 	cooldown += fire_interval
+	if sfx != null:
+		sfx.play()
 
 	var flash := MUZZLE_FLASH_SCENE.instantiate() as Node2D
 	flash.global_position = entity.global_position + MUZZLE_OFFSET

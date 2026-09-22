@@ -1,8 +1,8 @@
 class_name DanmakuComponent
 extends Component
 
-enum Pattern { SPIRAL_BLOOM, RING_PULSE, AIMED_FANS, WALL_GAP, CROSS_SPIRALS, PETAL_BURST, SHOOTER }
-enum Preset { BOSS_ONE, BOSS_TWO, MEDIUM }
+enum Pattern { SPIRAL_BLOOM, RING_PULSE, AIMED_FANS, WALL_GAP, CROSS_SPIRALS, PETAL_BURST, SHOOTER, STARBURST_LINES, SNAKE_LINES, BRAID_LINES, GRID_LINES, POLYGON_WAVES }
+enum Preset { BOSS_ONE, BOSS_TWO, MEDIUM, BOSS_THREE }
 
 const BULLET_SCENE := preload("res://bullet/bullet_enemy.tscn")
 const MAX_ENEMY_BULLETS := 1000
@@ -13,10 +13,17 @@ const DEFAULT_ANIMATIONS := {
 	Pattern.PETAL_BURST: "attack_radial",
 	Pattern.AIMED_FANS: "attack_homing_cone",
 	Pattern.WALL_GAP: "attack_horizontal_line",
+	Pattern.STARBURST_LINES: "attack_radial",
+	Pattern.POLYGON_WAVES: "attack_surround_stream",
+	Pattern.BRAID_LINES: "attack_surround_stream",
+	Pattern.SNAKE_LINES: "attack_homing_cone",
+	Pattern.GRID_LINES: "attack_horizontal_line",
 }
 
 @export var preset: Preset = Preset.BOSS_ONE
 @export var density_scale: float = 1.0
+@export var speed_scale: float = 1.0
+@export var bullet_cap: int = 1000
 @export var start_on_screen: bool = false
 @export var palette: PackedColorArray = PackedColorArray([Color(1.0, 0.35, 0.6, 1.0), Color(0.65, 0.5, 1.0, 1.0), Color(0.4, 0.85, 1.0, 1.0)])
 
@@ -55,6 +62,9 @@ func stop() -> void:
 func _step(pattern: Pattern, bars: int) -> Dictionary:
 	return {"pattern": pattern, "bars": bars}
 
+func _combo(first: Pattern, second: Pattern, bars: int) -> Dictionary:
+	return {"pattern": first, "also": second, "bars": bars}
+
 func _shooter(node_name: String, bars: int, per_beat: int, shots: int) -> Dictionary:
 	return {"pattern": Pattern.SHOOTER, "bars": bars, "shooter": node_name, "per_beat": per_beat, "shots": shots}
 
@@ -86,6 +96,18 @@ func _build_program() -> void:
 			]
 		Preset.MEDIUM:
 			program = [_step(Pattern.RING_PULSE, 2), _step(Pattern.AIMED_FANS, 2)]
+		Preset.BOSS_THREE:
+			program = [
+				_step(Pattern.STARBURST_LINES, 4),
+				_step(Pattern.POLYGON_WAVES, 4),
+				_step(Pattern.BRAID_LINES, 4),
+				_step(Pattern.GRID_LINES, 4),
+				_step(Pattern.SNAKE_LINES, 4),
+				_combo(Pattern.STARBURST_LINES, Pattern.SPIRAL_BLOOM, 4),
+				_step(Pattern.POLYGON_WAVES, 4),
+				_combo(Pattern.BRAID_LINES, Pattern.GRID_LINES, 4),
+				_combo(Pattern.SNAKE_LINES, Pattern.POLYGON_WAVES, 4),
+			]
 
 func _can_run() -> bool:
 	if not active or health.dead or not can_process():
@@ -138,9 +160,15 @@ func _play_animation() -> void:
 func _on_tick(step: int, bar: int) -> void:
 	if phase.is_empty() or not _can_run():
 		return
-	if get_tree().get_nodes_in_group("enemy_bullets").size() > MAX_ENEMY_BULLETS:
+	if get_tree().get_nodes_in_group("enemy_bullets").size() > bullet_cap:
 		return
-	match phase["pattern"]:
+	_run_pattern(phase["pattern"], step, bar)
+	if phase.has("also"):
+		_run_pattern(phase["also"], step, bar)
+	counter += 1
+
+func _run_pattern(pattern: int, step: int, bar: int) -> void:
+	match pattern:
 		Pattern.SPIRAL_BLOOM:
 			_spiral_bloom(step, bar)
 		Pattern.RING_PULSE:
@@ -153,7 +181,16 @@ func _on_tick(step: int, bar: int) -> void:
 			_cross_spirals(step)
 		Pattern.PETAL_BURST:
 			_petal_burst(step, bar)
-	counter += 1
+		Pattern.STARBURST_LINES:
+			_starburst_lines(step, bar)
+		Pattern.SNAKE_LINES:
+			_snake_lines()
+		Pattern.BRAID_LINES:
+			_braid_lines(bar)
+		Pattern.GRID_LINES:
+			_grid_lines(step)
+		Pattern.POLYGON_WAVES:
+			_polygon_waves(step, bar)
 
 func _aim() -> Vector2:
 	var target := get_tree().get_first_node_in_group("player") as Node2D
@@ -164,12 +201,15 @@ func _aim() -> Vector2:
 func _tint(index: int) -> Color:
 	return palette[index % palette.size()]
 
-func _fire(direction: Vector2, speed: float, tint: Color, dot_scale: float = 1.0, at: Vector2 = Vector2.INF) -> void:
+func _fire(direction: Vector2, speed: float, tint: Color, dot_scale: float = 1.0, at: Vector2 = Vector2.INF, wave_amplitude: float = 0.0, wave_frequency: float = 0.0, wave_phase: float = 0.0) -> void:
 	var bullet := BULLET_SCENE.instantiate() as Bullet
 	entity.get_parent().add_child(bullet)
 	bullet.global_position = entity.global_position if at == Vector2.INF else at
 	bullet.direction = direction
-	bullet.speed = speed
+	bullet.speed = speed * speed_scale
+	bullet.wave_amplitude = wave_amplitude
+	bullet.wave_frequency = wave_frequency
+	bullet.wave_phase = wave_phase
 	(bullet.get_node("Visual") as Polygon2D).color = tint
 	if dot_scale != 1.0:
 		bullet.scale = Vector2.ONE * dot_scale
@@ -246,3 +286,68 @@ func _petal_burst(step: int, bar: int) -> void:
 			var speed := 200.0 + 42.0 * float(k)
 			for lateral in [-0.06, 0.0, 0.06]:
 				_fire(Vector2.from_angle(heading + lateral), speed, _tint(petal))
+
+func _starburst_lines(step: int, bar: int) -> void:
+	var density := _density()
+	if density < 0.9 and step % 2 != 0:
+		return
+	var spokes := clampi(roundi(9.0 * density), 6, 16)
+	var base := float(bar) * (PI / float(spokes)) + 0.15 * sin(float(bar))
+	for i in spokes:
+		var heading := base + TAU * float(i) / float(spokes)
+		_fire(Vector2.from_angle(heading), 330.0, _tint(i + (step >> 2)))
+
+func _snake_lines() -> void:
+	var lines := clampi(roundi(5.0 * _density()), 3, 8)
+	var base := PI + 0.8 * sin(float(counter) * 0.05)
+	for i in lines:
+		var spread := (float(i) / float(lines - 1) - 0.5) * 1.7
+		var amplitude := 85.0 * (1.0 if i % 2 == 0 else -1.0)
+		_fire(Vector2.from_angle(base + spread), 300.0, _tint(i), 1.0, Vector2.INF, amplitude, 4.5, 0.0)
+
+func _braid_lines(bar: int) -> void:
+	var braids := clampi(roundi(3.0 * _density()), 2, 5)
+	var base := float(bar) * 0.41
+	for i in braids:
+		var heading := Vector2.from_angle(base + TAU * float(i) / float(braids))
+		for strand in 2:
+			_fire(heading, 280.0, _tint(i + strand), 1.0, Vector2.INF, 110.0, 4.0, PI * float(strand))
+
+func _grid_lines(step: int) -> void:
+	if step % 4 != 0:
+		return
+	gap_phase += 0.7
+	if step == 0 or step == 8:
+		var from_top := step == 0
+		var gap_x := 1300.0 + 850.0 * sin(gap_phase)
+		var x := 200.0
+		while x < 2540.0:
+			if absf(x - gap_x) > 170.0:
+				_fire(Vector2.DOWN if from_top else Vector2.UP, 300.0, _tint(step >> 3), 1.0, Vector2(x, -20.0 if from_top else 1460.0))
+			x += 66.0
+	else:
+		var gap_y := 720.0 + 470.0 * sin(gap_phase * 1.3)
+		var wall_x := entity.global_position.x - 40.0
+		var y := 40.0
+		while y < 1420.0:
+			if absf(y - gap_y) > 190.0:
+				_fire(Vector2.LEFT, 300.0, _tint(2), 1.0, Vector2(wall_x, y))
+			y += 64.0
+
+func _polygon_waves(step: int, bar: int) -> void:
+	if step != 0 and step != 8:
+		return
+	var center := entity.global_position
+	for layer in 2:
+		var sides := 3 + (bar + (step >> 3) + layer) % 4
+		var skip := 2 if (bar % 2 == 1 and sides >= 5) else 1
+		var spin := (float(bar) * 0.29 + float(step) * 0.05) * (1.0 if layer == 0 else -1.0)
+		var radius := 120.0 - 55.0 * float(layer)
+		var speed := 250.0 - 80.0 * float(layer)
+		var tint := _tint(bar + (step >> 3) + layer)
+		for k in sides:
+			var from_vertex := Vector2.from_angle(spin + TAU * float(k) / float(sides)) * radius
+			var to_vertex := Vector2.from_angle(spin + TAU * float((k + skip) % sides) / float(sides)) * radius
+			for j in 10:
+				var offset := from_vertex.lerp(to_vertex, float(j) / 10.0)
+				_fire(offset.normalized(), speed, tint, 1.0, center + offset)
