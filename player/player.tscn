@@ -13,6 +13,7 @@
 [ext_resource type="Script" uid="uid://casre5ttonpx3" path="res://components/sfx_component.gd" id="11"]
 [ext_resource type="AudioStream" uid="uid://so0yvsx3shhn" path="res://audio/player_shot.ogg" id="12"]
 [ext_resource type="Script" uid="uid://b638fpvm1m5nh" path="res://components/player_animation_component.gd" id="13"]
+[ext_resource type="Texture2D" uid="uid://crei441b5vlt0" path="res://player/head.png" id="14"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 24.0
@@ -98,19 +99,25 @@ _data = {
 }
 
 [node name="Player" type="Area2D" unique_id=812257637]
+scale = Vector2(1.6875, 2.1875)
 collision_mask = 2
 script = ExtResource("1")
 
 [node name="Visual" type="Polygon2D" parent="." unique_id=1231266568]
+self_modulate = Color(1, 1, 1, 0)
 color = Color(0.3, 0.8, 1, 1)
-polygon = PackedVector2Array(28, 0, -20, -20, -10, 0, -20, 20)
-uv = PackedVector2Array(28, 0, -20, -20, -10, 0, -20, 20)
+polygon = PackedVector2Array(27, 0, 26.32, 3.34, 24.33, 6.51, 21.11, 9.35, 16.83, 11.73, 11.71, 13.51, 6.01, 14.62, 0, 15, -6.01, 14.62, -11.71, 13.51, -16.83, 11.73, -21.11, 9.35, -24.33, 6.51, -26.32, 3.34, -27, 0, -26.32, -3.34, -24.33, -6.51, -21.11, -9.35, -16.83, -11.73, -11.71, -13.51, -6.01, -14.62, 0, -15, 6.01, -14.62, 11.71, -13.51, 16.83, -11.73, 21.11, -9.35, 24.33, -6.51, 26.32, -3.34)
+
+[node name="Head" type="Sprite2D" parent="Visual" unique_id=548219307]
+scale = Vector2(0.196, 0.151)
+texture = ExtResource("14")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=656952921]
+scale = Vector2(0.43, 0.375)
 shape = SubResource("CircleShape2D_1")
 
 [node name="InhaleIndicator" type="Polygon2D" parent="." unique_id=777482674]
-z_index = -1
+z_index = 1
 
 [node name="HealthComponent" type="Node" parent="." unique_id=448475758]
 script = ExtResource("2")

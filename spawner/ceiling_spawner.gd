@@ -6,9 +6,9 @@ extends Node2D
 @export var scroll_speed: float = 260.0
 @export var spawn_edge_x: float = 2600.0
 @export var cluster_size_range: Vector2i = Vector2i(1, 3)
-@export var width_range: Vector2 = Vector2(200.0, 720.0)
-@export var depth_range: Vector2 = Vector2(130.0, 470.0)
-@export var vertex_range: Vector2i = Vector2i(3, 6)
+@export var width_range: Vector2 = Vector2(220.0, 900.0)
+@export var depth_range: Vector2 = Vector2(80.0, 260.0)
+@export var vertex_range: Vector2i = Vector2i(14, 20)
 @export var neighbor_offset_range: Vector2 = Vector2(-40.0, 70.0)
 @export var gap_range: Vector2 = Vector2(2800.0, 6500.0)
 @export var sniper_chance: float = 0.45

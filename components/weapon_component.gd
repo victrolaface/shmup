@@ -3,7 +3,7 @@ extends Component
 
 const MUZZLE_FLASH_SCENE := preload("res://effects/muzzle_flash.tscn")
 const DIAGONAL_STEP_DEGREES := 14.0
-const MUZZLE_OFFSET := Vector2(45, 0)
+const MUZZLE_OFFSET := Vector2(0, 8.75)
 
 @export var bullet_scene: PackedScene = preload("res://bullet/bullet_player.tscn")
 @export var fire_interval: float = 0.12

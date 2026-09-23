@@ -1,69 +1,92 @@
 class_name CeilingSkin
 extends Node2D
 
-const BODY_COLOR := Color(0.16, 0.13, 0.25, 1)
-const FACET_COLOR := Color(0.22, 0.18, 0.33, 1)
-const EDGE_COLOR := Color(0.45, 0.38, 0.65, 1)
+const BODY_COLOR := Color(0.64, 0.66, 0.7, 1)
+const SHADE_COLOR := Color(0.5, 0.52, 0.58, 1)
+const EDGE_COLOR := Color(0.35, 0.36, 0.42, 1)
+const RIB_COLOR := Color(0.3, 0.32, 0.38, 1)
+const GONDOLA_COLOR := Color(0.3, 0.28, 0.3, 1)
+const GONDOLA_EDGE_COLOR := Color(0.2, 0.19, 0.2, 1)
 const TOP_OVERSHOOT := 300.0
 const EDGE_WIDTH := 6.0
+const RIB_WIDTH := 4.0
+const RIB_COUNT := 7
 
 var width: float = 300.0
 var depth: float = 300.0
-var tip_x: float = 0.0
 var body: DestructibleBodyComponent
-var facet_pieces: Array[PackedVector2Array] = []
+var rib_lines: Array[PackedVector2Array] = []
+var visible_ribs: Array[PackedVector2Array] = []
+var has_gondola: bool = false
+var gondola_rect: Rect2
+var gondola_visible: bool = false
+var shade_pieces: Array[PackedVector2Array] = []
 
-func configure(new_width: float, new_depth: float, vertex_count: int) -> void:
+func configure(new_width: float, new_depth: float, segment_count: int) -> void:
 	width = new_width
-	depth = new_depth
+	depth = minf(new_depth, new_width * 0.32)
 	var half := width * 0.5
-	var tip_t := randf_range(-0.4, 0.4)
-	tip_x = tip_t * half
-
-	var ts: Array[float] = []
-	for i in vertex_count + 1:
-		ts.append(float(i) / float(vertex_count) * 2.0 - 1.0)
-	ts.append(tip_t)
-	ts.sort()
+	var segments := maxi(segment_count, 10)
 
 	var bottom := PackedVector2Array()
-	for i in ts.size():
-		var t := ts[i]
-		var falloff: float = 1.0 - absf(t - tip_t) / (1.0 + absf(tip_t))
-		var d: float = depth * lerpf(0.18, 1.0, falloff)
-		if is_equal_approx(t, tip_t):
-			d = depth
-		elif i > 0 and i < ts.size() - 1:
-			d *= randf_range(0.8, 1.0)
+	for i in segments + 1:
+		var t := -1.0 + 2.0 * float(i) / float(segments)
+		var d: float = depth * sqrt(maxf(0.0, 1.0 - t * t))
 		bottom.append(Vector2(t * half, d))
 
 	var outline := PackedVector2Array([Vector2(-half, -TOP_OVERSHOOT), Vector2(half, -TOP_OVERSHOOT)])
 	for i in range(bottom.size() - 1, -1, -1):
 		outline.append(bottom[i])
 
+	rib_lines.clear()
+	for i in RIB_COUNT:
+		var t := -0.85 + 1.7 * float(i) / float(RIB_COUNT - 1)
+		var x := t * half
+		var d: float = depth * sqrt(maxf(0.0, 1.0 - t * t))
+		rib_lines.append(PackedVector2Array([Vector2(x, 0.0), Vector2(x, d)]))
+
+	has_gondola = randf() < 0.75
+	if has_gondola:
+		var gondola_t := randf_range(-0.25, 0.25)
+		var gondola_x := gondola_t * half
+		var gondola_d: float = depth * sqrt(maxf(0.0, 1.0 - gondola_t * gondola_t))
+		var gondola_w := clampf(width * 0.16, 36.0, 100.0)
+		var gondola_h := clampf(depth * 0.24, 26.0, 70.0)
+		gondola_rect = Rect2(gondola_x - gondola_w * 0.5, gondola_d - 4.0, gondola_w, gondola_h)
+
 	body = DestructibleBodyComponent.find(get_parent())
 	body.changed.connect(_refresh)
 	body.anchor_direction = Vector2.UP
-	body.debris_colors = PackedColorArray([BODY_COLOR, FACET_COLOR, EDGE_COLOR])
+	body.debris_colors = PackedColorArray([BODY_COLOR, SHADE_COLOR, EDGE_COLOR])
 	body.set_polygon(outline)
 
 func adopt(source: CeilingSkin, fragment_pieces: Array[PackedVector2Array]) -> void:
 	width = source.width
 	depth = source.depth
-	tip_x = source.tip_x
+	rib_lines = source.rib_lines
+	has_gondola = source.has_gondola
+	gondola_rect = source.gondola_rect
 	body = DestructibleBodyComponent.find(get_parent())
 	body.changed.connect(_refresh)
 	body.debris_colors = source.body.debris_colors
 	body.set_pieces(fragment_pieces)
 
 func _refresh() -> void:
-	facet_pieces.clear()
+	shade_pieces.clear()
+	var half := width * 0.5
 	var zone := PackedVector2Array([
-		Vector2(tip_x, -TOP_OVERSHOOT - 50.0), Vector2(width, -TOP_OVERSHOOT - 50.0),
-		Vector2(width, depth + 100.0), Vector2(tip_x, depth + 100.0),
+		Vector2(-half, depth * 0.4), Vector2(half, depth * 0.4),
+		Vector2(half, depth + 50.0), Vector2(-half, depth + 50.0),
 	])
 	for piece in body.pieces:
-		facet_pieces.append_array(DestructibleBodyComponent.solid_results(Geometry2D.intersect_polygons(piece, zone)))
+		shade_pieces.append_array(DestructibleBodyComponent.solid_results(Geometry2D.intersect_polygons(piece, zone)))
+
+	visible_ribs.clear()
+	for rib in rib_lines:
+		if body.contains_local(rib[1]):
+			visible_ribs.append(rib)
+
+	gondola_visible = has_gondola and body.contains_local(gondola_rect.position + Vector2(gondola_rect.size.x * 0.5, 0.0))
 	queue_redraw()
 
 func _fill(polygon: PackedVector2Array, color: Color) -> void:
@@ -75,8 +98,23 @@ func _draw() -> void:
 		return
 	for part in body.parts:
 		draw_colored_polygon(part, BODY_COLOR)
-	for piece in facet_pieces:
-		_fill(piece, FACET_COLOR)
+	for piece in shade_pieces:
+		_fill(piece, SHADE_COLOR)
+
+	for rib in visible_ribs:
+		draw_line(rib[0], rib[1], RIB_COLOR, RIB_WIDTH)
+
+	if gondola_visible:
+		draw_rect(gondola_rect, GONDOLA_COLOR)
+		var closed := PackedVector2Array([
+			gondola_rect.position,
+			Vector2(gondola_rect.position.x + gondola_rect.size.x, gondola_rect.position.y),
+			gondola_rect.position + gondola_rect.size,
+			Vector2(gondola_rect.position.x, gondola_rect.position.y + gondola_rect.size.y),
+			gondola_rect.position,
+		])
+		draw_polyline(closed, GONDOLA_EDGE_COLOR, 3.0)
+
 	for piece in body.pieces:
 		var closed := piece.duplicate()
 		closed.append(piece[0])

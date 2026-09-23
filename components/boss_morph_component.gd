@@ -79,10 +79,11 @@ func _randomize_bullets() -> void:
 	if danmaku == null:
 		return
 	danmaku.speed_scale = randf_range(bullet_speed_range.x, bullet_speed_range.y)
+	var bullet_hue := randf_range(0.78, 0.95)
 	danmaku.palette = PackedColorArray([
-		Color.from_hsv(fposmod(hue + 0.5, 1.0), 0.65, 1.0),
-		Color.from_hsv(fposmod(hue + 0.62, 1.0), 0.55, 1.0),
-		Color.from_hsv(fposmod(hue + 0.38, 1.0), 0.6, 1.0),
+		Color.from_hsv(bullet_hue, 0.95, 1.0),
+		Color.from_hsv(fposmod(bullet_hue + 0.04, 1.0), 0.9, 1.0),
+		Color.from_hsv(fposmod(bullet_hue - 0.04, 1.0), 0.92, 1.0),
 	])
 
 func _build_animations() -> void:

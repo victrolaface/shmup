@@ -1,0 +1,99 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://background/scrolling_layer.gd" id="1"]
+[ext_resource type="Script" path="res://background/cloud_layer.gd" id="2"]
+[ext_resource type="Script" path="res://background/suburb_layer.gd" id="3"]
+[ext_resource type="Script" path="res://background/sky_layer.gd" id="4"]
+[ext_resource type="Script" path="res://background/airship_layer.gd" id="5"]
+
+[node name="Background" type="Node2D"]
+z_index = -100
+z_as_relative = false
+
+[node name="Sky" type="Node2D" parent="."]
+script = ExtResource("1")
+scroll_speed = 9.6
+
+[node name="TileA" type="Node2D" parent="Sky"]
+script = ExtResource("4")
+sun_position = Vector2(1280, 300)
+sun_radius = 150.0
+
+[node name="TileB" type="Node2D" parent="Sky"]
+position = Vector2(2560, 0)
+script = ExtResource("4")
+draw_sun = false
+
+[node name="CloudsFar" type="Node2D" parent="."]
+script = ExtResource("1")
+scroll_speed = 30.0
+
+[node name="TileA" type="Node2D" parent="CloudsFar"]
+script = ExtResource("2")
+rng_seed = 1
+cloud_count = 24
+y_range = Vector2(30, 420)
+puff_scale_range = Vector2(0.45, 0.75)
+
+[node name="TileB" type="Node2D" parent="CloudsFar"]
+position = Vector2(2560, 0)
+script = ExtResource("2")
+rng_seed = 1
+cloud_count = 24
+y_range = Vector2(30, 420)
+puff_scale_range = Vector2(0.45, 0.75)
+
+[node name="Airships" type="Node2D" parent="."]
+script = ExtResource("1")
+scroll_speed = 42.0
+
+[node name="TileA" type="Node2D" parent="Airships"]
+script = ExtResource("5")
+rng_seed = 21
+airship_count = 3
+y_range = Vector2(120, 550)
+
+[node name="TileB" type="Node2D" parent="Airships"]
+position = Vector2(2560, 0)
+script = ExtResource("5")
+rng_seed = 21
+airship_count = 3
+y_range = Vector2(120, 550)
+
+[node name="CloudsNear" type="Node2D" parent="."]
+script = ExtResource("1")
+scroll_speed = 54.0
+
+[node name="TileA" type="Node2D" parent="CloudsNear"]
+script = ExtResource("2")
+rng_seed = 7
+cloud_count = 14
+y_range = Vector2(120, 600)
+puff_scale_range = Vector2(0.9, 1.4)
+
+[node name="TileB" type="Node2D" parent="CloudsNear"]
+position = Vector2(2560, 0)
+script = ExtResource("2")
+rng_seed = 7
+cloud_count = 14
+y_range = Vector2(120, 600)
+puff_scale_range = Vector2(0.9, 1.4)
+
+[node name="Suburb" type="Node2D" parent="."]
+script = ExtResource("1")
+scroll_speed = 96.0
+
+[node name="TileA" type="Node2D" parent="Suburb"]
+script = ExtResource("3")
+rng_seed = 2
+ground_y = 1300.0
+house_count = 5
+tree_count = 6
+
+[node name="TileB" type="Node2D" parent="Suburb"]
+position = Vector2(2560, 0)
+script = ExtResource("3")
+rng_seed = 2
+ground_y = 1300.0
+house_count = 5
+tree_count = 6

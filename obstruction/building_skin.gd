@@ -1,13 +1,13 @@
 class_name BuildingSkin
 extends Node2D
 
-const BODY_COLOR := Color(0.13, 0.15, 0.26, 1)
-const ROOF_COLOR := Color(0.32, 0.36, 0.52, 1)
-const PITCHED_ROOF_COLOR := Color(0.45, 0.2, 0.22, 1)
-const PITCHED_EDGE_COLOR := Color(0.62, 0.3, 0.32, 1)
-const CHIMNEY_COLOR := Color(0.25, 0.14, 0.16, 1)
-const WINDOW_LIT := Color(1.0, 0.85, 0.4, 1)
-const WINDOW_DARK := Color(0.08, 0.09, 0.16, 1)
+const BODY_COLOR := Color(0.82, 0.76, 0.64, 1)
+const ROOF_COLOR := Color(0.58, 0.52, 0.46, 1)
+const PITCHED_ROOF_COLOR := Color(0.6, 0.36, 0.32, 1)
+const PITCHED_EDGE_COLOR := Color(0.68, 0.42, 0.38, 1)
+const CHIMNEY_COLOR := Color(0.42, 0.36, 0.32, 1)
+const WINDOW_GLASS := Color(0.62, 0.76, 0.82, 1)
+const AWNING_COLORS := [Color(0.75, 0.32, 0.3, 1), Color(0.3, 0.55, 0.5, 1), Color(0.85, 0.6, 0.25, 1), Color(0.45, 0.4, 0.62, 1)]
 const BASE_OVERSHOOT := 60.0
 const EDGE_WIDTH := 5.0
 
@@ -16,7 +16,7 @@ var height: float = 300.0
 var roof_height: float = 0.0
 var body: DestructibleBodyComponent
 var windows: Array[Rect2] = []
-var window_lit: Array[bool] = []
+var window_color: Array[Color] = []
 var visible_windows: Array[int] = []
 var roof_pieces: Array[PackedVector2Array] = []
 var chimney_base: Vector2 = Vector2.ZERO
@@ -40,7 +40,7 @@ func configure(new_width: float, new_height: float, new_roof_height: float = 0.0
 	body = DestructibleBodyComponent.find(get_parent())
 	body.changed.connect(_refresh)
 	body.anchor_direction = Vector2.DOWN
-	body.debris_colors = PackedColorArray([BODY_COLOR, BODY_COLOR, ROOF_COLOR, WINDOW_LIT])
+	body.debris_colors = PackedColorArray([BODY_COLOR, BODY_COLOR, ROOF_COLOR, WINDOW_GLASS])
 	if roof_height > 0.0:
 		body.debris_colors.append_array(PackedColorArray([PITCHED_ROOF_COLOR, PITCHED_ROOF_COLOR, PITCHED_EDGE_COLOR]))
 	body.set_polygon(outline)
@@ -50,7 +50,7 @@ func adopt(source: BuildingSkin, fragment_pieces: Array[PackedVector2Array]) -> 
 	height = source.height
 	roof_height = source.roof_height
 	windows = source.windows
-	window_lit = source.window_lit
+	window_color = source.window_color
 	chimney_base = source.chimney_base
 	body = DestructibleBodyComponent.find(get_parent())
 	body.changed.connect(_refresh)
@@ -59,7 +59,7 @@ func adopt(source: BuildingSkin, fragment_pieces: Array[PackedVector2Array]) -> 
 
 func _build_windows() -> void:
 	windows.clear()
-	window_lit.clear()
+	window_color.clear()
 	var columns := int((width - 40.0) / 52.0)
 	var rows := int((height - 60.0) / 72.0)
 	if columns < 1 or rows < 1:
@@ -68,7 +68,7 @@ func _build_windows() -> void:
 	for row in rows:
 		for column in columns:
 			windows.append(Rect2(-width * 0.5 + 20.0 + float(column) * x_step + (x_step - 26.0) * 0.5, -height * 0.5 + 34.0 + float(row) * 72.0, 26.0, 38.0))
-			window_lit.append(randf() < 0.45)
+			window_color.append(AWNING_COLORS[randi() % AWNING_COLORS.size()] if randf() < 0.4 else WINDOW_GLASS)
 
 func _refresh() -> void:
 	roof_pieces.clear()
@@ -103,7 +103,7 @@ func _draw() -> void:
 		draw_rect(Rect2(chimney_base.x - 14.0, chimney_base.y - 46.0, 28.0, 56.0), CHIMNEY_COLOR)
 
 	for index in visible_windows:
-		draw_rect(windows[index], WINDOW_LIT if window_lit[index] else WINDOW_DARK)
+		draw_rect(windows[index], window_color[index])
 
 	var edge := PITCHED_EDGE_COLOR if roof_height > 0.0 else ROOF_COLOR
 	for piece in body.pieces:

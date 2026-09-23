@@ -30,7 +30,7 @@ const DEFAULT_ANIMATIONS := {
 @export var speed_scale: float = 1.0
 @export var bullet_cap: int = 800
 @export var start_on_screen: bool = false
-@export var palette: PackedColorArray = PackedColorArray([Color(1.0, 0.35, 0.6, 1.0), Color(0.65, 0.5, 1.0, 1.0), Color(0.4, 0.85, 1.0, 1.0)])
+@export var palette: PackedColorArray = PackedColorArray([Color(0.98, 0.05, 1.0, 1.0), Color(0.7, 0.05, 1.0, 1.0), Color(1.0, 0.05, 0.73, 1.0)])
 
 var program: Array[Dictionary] = []
 var active: bool = false
