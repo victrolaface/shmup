@@ -99,7 +99,7 @@ _data = {
 }
 
 [node name="Player" type="Area2D" unique_id=812257637]
-scale = Vector2(1.6875, 2.1875)
+scale = Vector2(2.6367188, 3.4179688)
 collision_mask = 2
 script = ExtResource("1")
 

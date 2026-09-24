@@ -43,6 +43,7 @@ func _sample_points() -> Array[Vector2]:
 	var total := 0
 	for piece in body.pieces:
 		total += piece.size()
+	@warning_ignore("integer_division")
 	var stride := maxi(1, total / MAX_SAMPLES)
 	var counter := 0
 	for piece in body.pieces:

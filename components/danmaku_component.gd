@@ -30,7 +30,9 @@ const DEFAULT_ANIMATIONS := {
 @export var speed_scale: float = 1.0
 @export var bullet_cap: int = 800
 @export var start_on_screen: bool = false
-@export var palette: PackedColorArray = PackedColorArray([Color(0.98, 0.05, 1.0, 1.0), Color(0.7, 0.05, 1.0, 1.0), Color(1.0, 0.05, 0.73, 1.0)])
+@export var palette: PackedColorArray = PackedColorArray([Color(0.78, 0.05, 0.88, 1.0), Color(0.6, 0.05, 0.85, 1.0), Color(0.85, 0.05, 0.62, 1.0)])
+@export var muzzle_offsets: PackedVector2Array = PackedVector2Array()
+@export var muzzle_flash_color: Color = Color(1.0, 0.6, 0.92, 0.9)
 
 var program: Array[Dictionary] = []
 var active: bool = false
@@ -212,7 +214,7 @@ func _run_pattern(pattern: int, step: int, bar: int) -> void:
 		Pattern.DIAMOND_LATTICE:
 			_diamond_lattice(step)
 		Pattern.TWIN_VORTEX:
-			_twin_vortex(step, bar)
+			_twin_vortex(step)
 
 func _aim() -> Vector2:
 	var target := get_tree().get_first_node_in_group("player") as Node2D
@@ -224,6 +226,12 @@ func _tint(index: int) -> Color:
 	return palette[index % palette.size()]
 
 func _fire(direction: Vector2, speed: float, tint: Color, dot_scale: float = 1.0, at: Vector2 = Vector2.INF, wave_amplitude: float = 0.0, wave_frequency: float = 0.0, wave_phase: float = 0.0) -> void:
+	if at == Vector2.INF and not muzzle_offsets.is_empty():
+		for m in muzzle_offsets.size():
+			var muzzle := muzzle_offsets[m]
+			_muzzle_flash(m, entity.to_global(muzzle))
+			_fire(direction, speed, tint, dot_scale, entity.to_global(muzzle), wave_amplitude, wave_frequency, wave_phase)
+		return
 	var bullet := BULLET_SCENE.instantiate() as Bullet
 	entity.get_parent().add_child(bullet)
 	bullet.global_position = entity.global_position if at == Vector2.INF else at
@@ -391,9 +399,9 @@ func _comet_rain(step: int, bar: int) -> void:
 	if step % 4 != 0:
 		return
 	var columns := clampi(roundi(6.0 * _density()), 4, 10)
-	var phase := float(bar) * 0.6 + float(step >> 2) * 0.4
+	var wave_offset := float(bar) * 0.6 + float(step >> 2) * 0.4
 	for c in columns:
-		var x := 200.0 + 2160.0 * float(c) / float(columns - 1) + 80.0 * sin(phase + float(c) * 0.9)
+		var x := 200.0 + 2160.0 * float(c) / float(columns - 1) + 80.0 * sin(wave_offset + float(c) * 0.9)
 		_fire(Vector2.DOWN, 260.0, _tint(c), 1.0, Vector2(x, -20.0), 40.0, 3.0, float(c) * 0.5)
 
 func _scissor_cross(step: int) -> void:
@@ -424,7 +432,7 @@ func _diamond_lattice(step: int) -> void:
 		if absf(pos.y - gap_pos) > 210.0:
 			_fire(dir, 280.0, tint, 1.0, pos)
 
-func _twin_vortex(step: int, bar: int) -> void:
+func _twin_vortex(step: int) -> void:
 	if step % 2 != 0:
 		return
 	var arms := clampi(roundi(3.0 * _density()), 2, 5)
@@ -437,3 +445,18 @@ func _twin_vortex(step: int, bar: int) -> void:
 		for i in arms:
 			var a := angle * spin_dir + TAU * float(i) / float(arms)
 			_fire(Vector2.from_angle(a), 280.0, tint, 1.0, centers[c])
+
+
+var last_flash_msec: Dictionary = {}
+
+func _muzzle_flash(index: int, pos: Vector2) -> void:
+	var now := Time.get_ticks_msec()
+	if now - int(last_flash_msec.get(index, -1000)) < 60:
+		return
+	last_flash_msec[index] = now
+	var flash := preload("res://effects/muzzle_flash.tscn").instantiate() as Node2D
+	flash.set("radius", 66.0)
+	flash.set("duration", 0.16)
+	flash.set("color", muzzle_flash_color)
+	flash.global_position = pos
+	entity.get_parent().add_child(flash)

@@ -2,6 +2,7 @@ class_name HitFlashComponent
 extends Component
 
 var visual: Polygon2D
+var sprite: Sprite2D
 @export var flash_color: Color = Color(1, 0.15, 0.15, 1)
 @export var duration: float = 0.15
 
@@ -14,6 +15,10 @@ func _ready() -> void:
 	visual = Component.of(entity, "Visual") as Polygon2D
 	health = HealthComponent.find(entity)
 	base_color = visual.color
+	for child in visual.get_children():
+		if child is Sprite2D:
+			sprite = child
+			break
 	health.damaged.connect(func(_amount: int) -> void: hit_timer = duration)
 
 func _physics_process(delta: float) -> void:
@@ -26,4 +31,7 @@ func _physics_process(delta: float) -> void:
 	var instant_flash := hit_timer / duration
 
 	var flash: float = max(ambient_flash, instant_flash)
-	visual.color = base_color.lerp(flash_color, flash)
+	if sprite != null:
+		sprite.modulate = Color.WHITE.lerp(flash_color, flash)
+	else:
+		visual.color = base_color.lerp(flash_color, flash)

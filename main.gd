@@ -1,10 +1,12 @@
 extends Node2D
 
 const BOSS_SCENES: Array[PackedScene] = [
-	preload("res://sub_boss/sub_boss_one.tscn"),
 	preload("res://sub_boss/boss_two.tscn"),
-	preload("res://sub_boss/boss_three.tscn"),
+	preload("res://sub_boss/sub_boss_one.tscn"),
+	preload("res://sub_boss/boss_wallstreet.tscn"),
 ]
+const MORPH_BOSS := preload("res://sub_boss/boss_three.tscn")
+const STAGE_BOSS_OVERRIDES := {"2-1": preload("res://sub_boss/boss_morph_one.tscn"), "2-2": MORPH_BOSS, "2-3": MORPH_BOSS}
 const SUB_BOSS_BAR_WIDTH := 400.0
 const SUPER_BAR_WIDTH := 120.0
 const LEVEL_BANNER_DURATION := 2.0
@@ -15,9 +17,9 @@ const HEART_SCALE := 1.35
 const HEART_SPACING := 58.0
 const HEART_FULL := Color(1, 0.25, 0.35, 1)
 const HEART_EMPTY := Color(0.25, 0.2, 0.25, 1)
-const SHOP_DELAY := 4.0
+const SHOP_DELAY := 6.5
 const UPGRADE_COST := 10
-const MAX_SHOP_PURCHASES := 2
+const MAX_SHOP_PURCHASES := 1
 const COMBO_BAR_WIDTH := 240.0
 
 @onready var score_label: Label = $UI/ScoreLabel
@@ -30,6 +32,7 @@ const COMBO_BAR_WIDTH := 240.0
 @onready var restart_button: Button = $UI/RestartButton
 @onready var close_button: Button = $UI/CloseButton
 @onready var skip_boss_button: Button = $UI/SkipBossButton
+@onready var kill_boss_button: Button = $UI/KillBossButton
 @onready var pause_label: Label = $UI/PauseLabel
 @onready var god_mode_label: Label = $UI/GodModeLabel
 @onready var god_mode_button: Button = $UI/GodModeButton
@@ -85,6 +88,16 @@ func _ready() -> void:
 	_set_spawn_interval_scale(LEVEL_1_1_INTERVAL_SCALE)
 	Conductor.start_song()
 
+
+
+
+
+
+
+
+
+
+
 func _set_spawn_interval_scale(interval_scale: float) -> void:
 	spawner.interval_scale = interval_scale
 	formation_spawner.interval_scale = interval_scale
@@ -106,12 +119,13 @@ func _toggle_pause() -> void:
 func _on_score_changed(new_score: int) -> void:
 	score_label.text = "SCORE: %d" % new_score
 
-func _on_currency_changed(new_currency: int) -> void:
-	currency_label.text = "%d" % new_currency
-
 func _process(_delta: float) -> void:
 	if Game.combo >= 2:
 		combo_bar_fill.size.x = COMBO_BAR_WIDTH * clampf(Game.combo_timer / Game.COMBO_WINDOW, 0.0, 1.0)
+
+func _on_currency_changed(new_currency: int) -> void:
+	currency_label.text = "%d" % new_currency
+
 
 func _on_combo_changed(combo: int, multiplier: float) -> void:
 	var visible_now := combo >= 2
@@ -171,6 +185,7 @@ func _on_skip_boss_pressed() -> void:
 func _on_sub_boss_timer_timeout() -> void:
 	boss_active = true
 	skip_boss_button.visible = false
+	kill_boss_button.visible = true
 	spawner.stop_spawning()
 	formation_spawner.stop_spawning()
 	ground_spawner.stop_spawning()
@@ -178,7 +193,8 @@ func _on_sub_boss_timer_timeout() -> void:
 	obstruction_spawner.stop_spawning()
 	ceiling_spawner.stop_spawning()
 
-	var sub_boss := BOSS_SCENES[mini(level_minor, BOSS_SCENES.size()) - 1].instantiate() as Node2D
+	var boss_scene: PackedScene = STAGE_BOSS_OVERRIDES.get("%d-%d" % [level_major, level_minor], BOSS_SCENES[mini(level_minor, BOSS_SCENES.size()) - 1])
+	var sub_boss := boss_scene.instantiate() as Node2D
 	sub_boss.position = Vector2(2900, 720)
 	entities.add_child(sub_boss)
 	var boss_health := HealthComponent.find(sub_boss)
@@ -192,6 +208,7 @@ func _on_sub_boss_health_changed(current: int, max_health: int) -> void:
 	sub_boss_bar_fill.size.x = SUB_BOSS_BAR_WIDTH * (float(current) / float(max_health))
 
 func _on_sub_boss_defeated() -> void:
+	kill_boss_button.visible = false
 	camera.shake(1.0)
 	sub_boss_bar.visible = false
 	await get_tree().create_timer(SHOP_DELAY).timeout
@@ -273,6 +290,7 @@ func _start_next_level() -> void:
 func _on_game_over() -> void:
 	is_game_over = true
 	skip_boss_button.visible = false
+	kill_boss_button.visible = false
 	game_over_label.visible = true
 	restart_button.visible = true
 	close_button.visible = true
@@ -284,3 +302,9 @@ func _on_restart_pressed() -> void:
 
 func _on_close_pressed() -> void:
 	Conductor.quit_game()
+
+func _on_kill_boss_pressed() -> void:
+	for boss in get_tree().get_nodes_in_group("sub_boss"):
+		var health := HealthComponent.find(boss)
+		if health != null and not health.dead:
+			health.take_damage(health.health)

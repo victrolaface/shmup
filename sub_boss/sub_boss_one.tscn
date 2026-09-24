@@ -7,8 +7,9 @@
 [ext_resource type="Script" uid="uid://dlgmneil1m37o" path="res://components/approach_stop_component.gd" id="5"]
 [ext_resource type="Script" uid="uid://c8hy6hnxuok55" path="res://components/boss_animation_component.gd" id="7"]
 [ext_resource type="Script" uid="uid://bnl56a3gaq4yk" path="res://components/shooter_component.gd" id="8"]
-[ext_resource type="Script" path="res://components/overlap_damage_component.gd" id="20"]
-[ext_resource type="Script" path="res://components/danmaku_component.gd" id="21"]
+[ext_resource type="Script" uid="uid://thinpjiaj75l" path="res://components/overlap_damage_component.gd" id="20"]
+[ext_resource type="Script" uid="uid://crr76ynldm2j4" path="res://components/danmaku_component.gd" id="21"]
+[ext_resource type="Texture2D" uid="uid://beof4krivfk8s" path="res://sub_boss/images/cat boss.png" id="30"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 324.0
@@ -21,7 +22,7 @@ resource_name = "attack_homing_cone"
 length = 0.6
 tracks/0/type = "value"
 tracks/0/imported = false
-tracks/0/enabled = true
+tracks/0/enabled = false
 tracks/0/path = NodePath("Visual:rotation")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
@@ -33,7 +34,7 @@ tracks/0/keys = {
 }
 tracks/1/type = "value"
 tracks/1/imported = false
-tracks/1/enabled = true
+tracks/1/enabled = false
 tracks/1/path = NodePath("Visual:scale")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
@@ -49,7 +50,7 @@ resource_name = "attack_horizontal_line"
 length = 0.6
 tracks/0/type = "value"
 tracks/0/imported = false
-tracks/0/enabled = true
+tracks/0/enabled = false
 tracks/0/path = NodePath("Visual:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
@@ -61,7 +62,7 @@ tracks/0/keys = {
 }
 tracks/1/type = "value"
 tracks/1/imported = false
-tracks/1/enabled = true
+tracks/1/enabled = false
 tracks/1/path = NodePath("Visual:scale")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
@@ -77,7 +78,7 @@ resource_name = "attack_radial"
 length = 0.9
 tracks/0/type = "value"
 tracks/0/imported = false
-tracks/0/enabled = true
+tracks/0/enabled = false
 tracks/0/path = NodePath("Visual:scale")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
@@ -89,7 +90,7 @@ tracks/0/keys = {
 }
 tracks/1/type = "value"
 tracks/1/imported = false
-tracks/1/enabled = true
+tracks/1/enabled = false
 tracks/1/path = NodePath("Visual:modulate")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
@@ -105,7 +106,7 @@ resource_name = "attack_surround_stream"
 length = 1.2
 tracks/0/type = "value"
 tracks/0/imported = false
-tracks/0/enabled = true
+tracks/0/enabled = false
 tracks/0/path = NodePath("Visual:rotation")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
@@ -117,7 +118,7 @@ tracks/0/keys = {
 }
 tracks/1/type = "value"
 tracks/1/imported = false
-tracks/1/enabled = true
+tracks/1/enabled = false
 tracks/1/path = NodePath("Visual:scale")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
@@ -133,7 +134,7 @@ resource_name = "death"
 length = 1.5
 tracks/0/type = "value"
 tracks/0/imported = false
-tracks/0/enabled = true
+tracks/0/enabled = false
 tracks/0/path = NodePath("Visual:scale")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
@@ -145,7 +146,7 @@ tracks/0/keys = {
 }
 tracks/1/type = "value"
 tracks/1/imported = false
-tracks/1/enabled = true
+tracks/1/enabled = false
 tracks/1/path = NodePath("Visual:rotation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
@@ -157,7 +158,7 @@ tracks/1/keys = {
 }
 tracks/2/type = "value"
 tracks/2/imported = false
-tracks/2/enabled = true
+tracks/2/enabled = false
 tracks/2/path = NodePath("Visual:modulate")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
@@ -190,7 +191,7 @@ length = 3.0
 loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
-tracks/0/enabled = true
+tracks/0/enabled = false
 tracks/0/path = NodePath("Visual:scale")
 tracks/0/interp = 2
 tracks/0/loop_wrap = true
@@ -202,7 +203,7 @@ tracks/0/keys = {
 }
 tracks/1/type = "value"
 tracks/1/imported = false
-tracks/1/enabled = true
+tracks/1/enabled = false
 tracks/1/path = NodePath("Visual:rotation")
 tracks/1/interp = 2
 tracks/1/loop_wrap = true
@@ -225,32 +226,37 @@ _data = {
 }
 
 [node name="SubBossOne" type="Area2D" unique_id=1732701256 groups=["enemies", "sub_boss"]]
+scale = Vector2(1.625, 1.625)
 collision_layer = 2
 
 [node name="Visual" type="Polygon2D" parent="." unique_id=1641988746]
+self_modulate = Color(1, 1, 1, 0)
 color = Color(0.6, 0.15, 0.7, 1)
 polygon = PackedVector2Array(-324, -252, 216, -324, 324, 0, 216, 324, -324, 252, -180, 0)
+
+[node name="Cat" type="Sprite2D" parent="Visual" unique_id=61883330]
+scale = Vector2(0.305, 0.305)
+texture = ExtResource("30")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1158627178]
 shape = SubResource("CircleShape2D_1")
 
-[node name="HurtBox" type="Area2D" parent="."]
+[node name="HurtBox" type="Area2D" parent="." unique_id=1539602341]
 collision_layer = 0
-collision_mask = 1
 monitorable = false
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox" unique_id=197905856]
 shape = SubResource("CircleShape2D_hurt")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=2079571403]
 libraries/ = SubResource("AnimationLibrary_boss")
 
-[node name="OverlapDamageComponent" type="Node" parent="."]
+[node name="OverlapDamageComponent" type="Node" parent="." unique_id=2002792690]
 script = ExtResource("20")
 
 [node name="HealthComponent" type="Node" parent="." unique_id=1340149171]
 script = ExtResource("1")
-max_health = 1450
+max_health = 3000
 free_on_death = false
 
 [node name="HitFlashComponent" type="Node" parent="." unique_id=500998656]
@@ -261,6 +267,8 @@ script = ExtResource("3")
 score_value = 500
 spawn_explosion = false
 spawn_smoke = false
+burst_count = 110
+burst_duration = 5.2
 
 [node name="DropComponent" type="Node" parent="." unique_id=1597667604]
 script = ExtResource("4")
@@ -276,7 +284,10 @@ script = ExtResource("5")
 approach_speed = 220.0
 stop_x_min = 1900.0
 stop_x_max = 1900.0
-hover_amplitude = 220.0
+entrance_tween_time = 2.8
+entrance_offset_y = -1300.0
+entrance_float = 45.0
+hover_amplitude = 60.0
 
 [node name="RadialShooter" type="Node" parent="." unique_id=500454970]
 script = ExtResource("8")
@@ -287,6 +298,7 @@ autostart = false
 burst_count = 14
 burst_pause = 1.5
 single_burst = true
+muzzle_offsets = PackedVector2Array(-214, 103, -116, -263)
 
 [node name="FanShooter" type="Node" parent="." unique_id=982927979]
 script = ExtResource("8")
@@ -297,6 +309,7 @@ autostart = false
 burst_count = 6
 burst_pause = 1.5
 single_burst = true
+muzzle_offsets = PackedVector2Array(-214, 103, -116, -263)
 
 [node name="CurtainShooter" type="Node" parent="." unique_id=902185949]
 script = ExtResource("8")
@@ -307,12 +320,14 @@ autostart = false
 burst_count = 4
 burst_pause = 1.5
 single_burst = true
+muzzle_offsets = PackedVector2Array(-214, 103, -116, -263)
 
-[node name="DanmakuComponent" type="Node" parent="."]
+[node name="DanmakuComponent" type="Node" parent="." unique_id=1737407128]
 script = ExtResource("21")
-preset = 0
+muzzle_offsets = PackedVector2Array(-214, 103, -116, -263)
 
 [node name="BossAnimationComponent" type="Node" parent="." unique_id=498097476]
 script = ExtResource("7")
+fall_on_death = true
 
 [connection signal="arrived" from="ApproachStopComponent" to="DanmakuComponent" method="begin"]

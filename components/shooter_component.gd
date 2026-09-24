@@ -32,15 +32,17 @@ const SPIRAL_STEP := 0.45
 @export var wave_amplitude: float = 100.0
 @export var wave_frequency: float = 5.0
 @export var radial_spokes: int = 20
-@export var radial_colors: PackedColorArray = PackedColorArray([Color(0.45, 0.65, 1.0, 1.0), Color(0.85, 0.5, 1.0, 1.0)])
+@export var radial_colors: PackedColorArray = PackedColorArray([Color(0.78, 0.05, 0.88, 1.0), Color(0.6, 0.05, 0.85, 1.0)])
 @export var fan_bullets: int = 7
 @export var fan_angle_degrees: float = 120.0
 @export var forced_pattern: int = -1
 @export var spiral_arms: int = 3
 @export var ring_bullets: int = 18
 @export var bullet_tint: Color = Color(0, 0, 0, 0)
+@export var muzzle_offsets: PackedVector2Array = PackedVector2Array()
+@export var muzzle_flash_color: Color = Color(1.0, 0.6, 0.92, 0.9)
 @export var animation_name: String = ""
-@export var curtain_colors: PackedColorArray = PackedColorArray([Color(0.98, 0.05, 1.0, 1.0), Color(0.7, 0.05, 1.0, 1.0), Color(1.0, 0.05, 0.73, 1.0), Color(0.85, 0.05, 0.95, 1.0)])
+@export var curtain_colors: PackedColorArray = PackedColorArray([Color(0.78, 0.05, 0.88, 1.0), Color(0.6, 0.05, 0.85, 1.0), Color(0.85, 0.05, 0.62, 1.0), Color(0.7, 0.05, 0.8, 1.0)])
 @export var curtain_spawn_offset_x: float = -100.0
 @export var curtain_dot_spacing: float = 62.0
 @export var curtain_wave_amplitude: float = 60.0
@@ -164,7 +166,7 @@ func _fire_random_pattern() -> void:
 	match pattern:
 		Pattern.FAN:
 			var aim := _aim_at_player()
-			for k in range(-(FAN_BULLETS / 2), FAN_BULLETS / 2 + 1):
+			for k in range(-(FAN_BULLETS >> 1), (FAN_BULLETS >> 1) + 1):
 				_spawn_bullet(aim.rotated(deg_to_rad(FAN_STEP_DEGREES) * k))
 		Pattern.RING:
 			var offset := (TAU / ring_bullets) * 0.5 * float(shots_in_burst % 2)
@@ -214,6 +216,12 @@ func _fire_waves() -> void:
 	_spawn_bullet(burst_direction, wave_amplitude, wave_frequency, PI)
 
 func _spawn_bullet(direction: Vector2, amplitude: float = 0.0, frequency: float = 0.0, phase: float = 0.0, tint: Color = Color(0, 0, 0, 0), dot_scale: float = 1.0, at: Vector2 = Vector2.INF) -> void:
+	if at == Vector2.INF and not muzzle_offsets.is_empty():
+		for m in muzzle_offsets.size():
+			var muzzle := muzzle_offsets[m]
+			_muzzle_flash(m, entity.to_global(muzzle))
+			_spawn_bullet(direction, amplitude, frequency, phase, tint, dot_scale, entity.to_global(muzzle))
+		return
 	var bullet := bullet_scene.instantiate() as Bullet
 	entity.get_parent().add_child(bullet)
 	bullet.global_position = entity.global_position if at == Vector2.INF else at
@@ -227,3 +235,17 @@ func _spawn_bullet(direction: Vector2, amplitude: float = 0.0, frequency: float 
 		(bullet.get_node("Visual") as Polygon2D).color = final_tint
 	if dot_scale != 1.0:
 		bullet.scale = Vector2.ONE * dot_scale
+
+var last_flash_msec: Dictionary = {}
+
+func _muzzle_flash(index: int, pos: Vector2) -> void:
+	var now := Time.get_ticks_msec()
+	if now - int(last_flash_msec.get(index, -1000)) < 60:
+		return
+	last_flash_msec[index] = now
+	var flash := preload("res://effects/muzzle_flash.tscn").instantiate() as Node2D
+	flash.set("radius", 66.0)
+	flash.set("duration", 0.16)
+	flash.set("color", muzzle_flash_color)
+	flash.global_position = pos
+	entity.get_parent().add_child(flash)

@@ -24,7 +24,7 @@ var shade_pieces: Array[PackedVector2Array] = []
 
 func configure(new_width: float, new_depth: float, segment_count: int) -> void:
 	width = new_width
-	depth = minf(new_depth, new_width * 0.32)
+	depth = minf(new_depth, new_width * 0.2)
 	var half := width * 0.5
 	var segments := maxi(segment_count, 10)
 
@@ -45,7 +45,7 @@ func configure(new_width: float, new_depth: float, segment_count: int) -> void:
 		var d: float = depth * sqrt(maxf(0.0, 1.0 - t * t))
 		rib_lines.append(PackedVector2Array([Vector2(x, 0.0), Vector2(x, d)]))
 
-	has_gondola = randf() < 0.75
+	has_gondola = true
 	if has_gondola:
 		var gondola_t := randf_range(-0.25, 0.25)
 		var gondola_x := gondola_t * half

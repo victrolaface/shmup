@@ -13,7 +13,7 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 260.0
 
-[node name="BossThree" type="Area2D" groups=["enemies", "sub_boss"]]
+[node name="BossMorphOne" type="Area2D" groups=["enemies", "sub_boss"]]
 collision_layer = 2
 
 [node name="Visual" type="Polygon2D" parent="."]
@@ -40,7 +40,7 @@ script = ExtResource("22")
 
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("1")
-max_health = 2300
+max_health = 1800
 free_on_death = false
 
 [node name="HitFlashComponent" type="Node" parent="."]

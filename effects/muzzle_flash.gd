@@ -2,6 +2,7 @@ extends Node2D
 
 @export var radius: float = 22.0
 @export var duration: float = 0.1
+@export var color: Color = Color(1, 1, 1, 0.9)
 
 func _ready() -> void:
 	var flash := Polygon2D.new()
@@ -11,7 +12,7 @@ func _ready() -> void:
 		var angle := (float(i) / segments) * TAU
 		points.append(Vector2(cos(angle), sin(angle)) * radius)
 	flash.polygon = points
-	flash.color = Color(1, 1, 1, 0.9)
+	flash.color = color
 	add_child(flash)
 
 	var tween := create_tween()

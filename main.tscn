@@ -281,6 +281,15 @@ offset_bottom = 152.0
 theme_override_font_sizes/font_size = 32
 text = "SKIP TO BOSS"
 
+[node name="KillBossButton" type="Button" parent="UI"]
+visible = false
+offset_left = 2216.0
+offset_top = 240.0
+offset_right = 2536.0
+offset_bottom = 296.0
+theme_override_font_sizes/font_size = 32
+text = "KILL BOSS"
+
 [node name="GodModeButton" type="Button" parent="UI"]
 process_mode = 3
 focus_mode = 0
@@ -317,6 +326,7 @@ script = ExtResource("6")
 [connection signal="pressed" from="UI/CloseButton" to="." method="_on_close_pressed"]
 [connection signal="pressed" from="UI/WindowCloseButton" to="." method="_on_close_pressed"]
 [connection signal="pressed" from="UI/SkipBossButton" to="." method="_on_skip_boss_pressed"]
+[connection signal="pressed" from="UI/KillBossButton" to="." method="_on_kill_boss_pressed"]
 [connection signal="pressed" from="UI/GodModeButton" to="." method="_on_god_mode_button_pressed"]
 [connection signal="pressed" from="UI/ShopMenu/Option0" to="." method="_on_shop_option_pressed" binds= [0]]
 [connection signal="pressed" from="UI/ShopMenu/Option1" to="." method="_on_shop_option_pressed" binds= [1]]

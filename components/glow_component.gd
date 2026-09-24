@@ -11,12 +11,14 @@ static var shared_texture: GradientTexture2D
 @export var core_intensity: float = 0.2
 @export var pulse_speed: float = 3.2
 @export var pulse_amount: float = 0.2
+@export var animate: bool = true
 
 var halo: Sprite2D
 var core: Sprite2D
 var time: float = 0.0
 
 func _ready() -> void:
+	set_process(animate)
 	time = randf() * TAU
 	var additive := CanvasItemMaterial.new()
 	additive.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD

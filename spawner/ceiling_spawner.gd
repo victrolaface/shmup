@@ -5,14 +5,15 @@ extends Node2D
 @export var sniper_scene: PackedScene = preload("res://enemy/enemy_rooftop_sniper.tscn")
 @export var scroll_speed: float = 260.0
 @export var spawn_edge_x: float = 2600.0
-@export var cluster_size_range: Vector2i = Vector2i(1, 3)
-@export var width_range: Vector2 = Vector2(220.0, 900.0)
-@export var depth_range: Vector2 = Vector2(80.0, 260.0)
+@export var cluster_size_range: Vector2i = Vector2i(1, 1)
+@export var width_range: Vector2 = Vector2(400.0, 1300.0)
+@export var depth_range: Vector2 = Vector2(70.0, 200.0)
 @export var vertex_range: Vector2i = Vector2i(14, 20)
 @export var neighbor_offset_range: Vector2 = Vector2(-40.0, 70.0)
 @export var gap_range: Vector2 = Vector2(2800.0, 6500.0)
 @export var sniper_chance: float = 0.45
 @export var sniper_radius: float = 16.0
+@export var y_offset: float = 90.0
 
 var interval_scale: float = 1.0
 var spawning: bool = true
@@ -38,7 +39,7 @@ func _spawn_cluster() -> void:
 
 func _spawn_polygon(center_x: float, width: float, depth: float) -> void:
 	var ceiling := ceiling_scene.instantiate() as Node2D
-	ceiling.position = Vector2(center_x, 0.0)
+	ceiling.position = Vector2(center_x, y_offset)
 	(ceiling.get_node("WaveMoveComponent") as WaveMoveComponent).speed = scroll_speed
 	var skin := ceiling.get_node("Skin") as CeilingSkin
 	skin.configure(width, depth, randi_range(vertex_range.x, vertex_range.y))

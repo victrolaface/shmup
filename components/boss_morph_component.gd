@@ -7,7 +7,7 @@ const EXPLOSION_SCENE := preload("res://effects/explosion.tscn")
 @export var radius_range: Vector2 = Vector2(230.0, 300.0)
 @export var spike_chance: float = 0.5
 @export var approach_speed_range: Vector2 = Vector2(190.0, 340.0)
-@export var hover_amplitude_range: Vector2 = Vector2(280.0, 470.0)
+@export var hover_amplitude_range: Vector2 = Vector2(60.0, 110.0)
 @export var hover_frequency_range: Vector2 = Vector2(0.5, 1.15)
 @export var bullet_speed_range: Vector2 = Vector2(0.85, 1.3)
 @export var spin_range: Vector2 = Vector2(0.1, 0.5)
@@ -81,20 +81,20 @@ func _randomize_bullets() -> void:
 	danmaku.speed_scale = randf_range(bullet_speed_range.x, bullet_speed_range.y)
 	var bullet_hue := randf_range(0.78, 0.95)
 	danmaku.palette = PackedColorArray([
-		Color.from_hsv(bullet_hue, 0.95, 1.0),
-		Color.from_hsv(fposmod(bullet_hue + 0.04, 1.0), 0.9, 1.0),
-		Color.from_hsv(fposmod(bullet_hue - 0.04, 1.0), 0.92, 1.0),
+		Color.from_hsv(bullet_hue, 0.95, 0.8),
+		Color.from_hsv(fposmod(bullet_hue + 0.04, 1.0), 0.9, 0.8),
+		Color.from_hsv(fposmod(bullet_hue - 0.04, 1.0), 0.92, 0.8),
 	])
 
 func _build_animations() -> void:
 	var player := Component.of(entity, "AnimationPlayer") as AnimationPlayer
 	var library := AnimationLibrary.new()
-	library.add_animation("idle", _pulse_animation(2.0, 1.03, true))
+	library.add_animation("idle", _pulse_animation(2.0, 1.0, true))
 	library.add_animation("hit", _pulse_animation(0.15, 1.05, false))
-	library.add_animation("attack_radial", _pulse_animation(0.6, 1.15, false))
-	library.add_animation("attack_surround_stream", _pulse_animation(0.6, 1.08, false))
-	library.add_animation("attack_homing_cone", _pulse_animation(0.6, 1.1, false))
-	library.add_animation("attack_horizontal_line", _pulse_animation(0.6, 1.1, false))
+	library.add_animation("attack_radial", _pulse_animation(0.6, 1.0, false))
+	library.add_animation("attack_surround_stream", _pulse_animation(0.6, 1.0, false))
+	library.add_animation("attack_homing_cone", _pulse_animation(0.6, 1.0, false))
+	library.add_animation("attack_horizontal_line", _pulse_animation(0.6, 1.0, false))
 	library.add_animation("death", _death_animation())
 	player.add_animation_library("", library)
 

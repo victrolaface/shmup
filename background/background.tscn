@@ -50,14 +50,14 @@ scroll_speed = 42.0
 [node name="TileA" type="Node2D" parent="Airships"]
 script = ExtResource("5")
 rng_seed = 21
-airship_count = 3
+airship_count = 1
 y_range = Vector2(120, 550)
 
 [node name="TileB" type="Node2D" parent="Airships"]
 position = Vector2(2560, 0)
 script = ExtResource("5")
 rng_seed = 21
-airship_count = 3
+airship_count = 1
 y_range = Vector2(120, 550)
 
 [node name="CloudsNear" type="Node2D" parent="."]
