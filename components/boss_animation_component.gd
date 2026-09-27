@@ -21,10 +21,19 @@ var dying: bool = false
 @export var fall_step_time: float = 0.22
 @export var fall_pause_time: float = 0.12
 @export var fall_sway: float = 30.0
+@export var debug_label: bool = false
+
+var status_box: Node2D
+var status_label: Label
+var last_status: String = ""
+const STATUS_OFFSET := Vector2(0, -320)
 
 func _ready() -> void:
 	animation_player = Component.of(entity, "AnimationPlayer") as AnimationPlayer
 	animation_player.animation_finished.connect(_on_animation_finished)
+
+	if debug_label:
+		_build_status_box()
 
 	var attacks := Component.of(entity, "BossAttackComponent") as BossAttackComponent
 	if attacks != null:
@@ -76,7 +85,39 @@ func _on_animation_finished(animation_name: StringName) -> void:
 
 var falling: bool = false
 
+func _build_status_box() -> void:
+	var box := Node2D.new()
+	box.top_level = true
+	box.z_index = 100
+	box.global_position = entity.global_position + STATUS_OFFSET
+
+	var bg := ColorRect.new()
+	bg.color = Color(0, 0, 0, 0.75)
+	bg.size = Vector2(300, 56)
+	bg.position = Vector2(-150, -28)
+	box.add_child(bg)
+
+	status_label = Label.new()
+	status_label.add_theme_font_size_override("font_size", 30)
+	status_label.add_theme_color_override("font_color", Color.WHITE)
+	status_label.size = bg.size
+	status_label.position = bg.position
+	status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	status_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	box.add_child(status_label)
+
+	entity.add_child.call_deferred(box)
+	status_box = box
+
 func _process(_delta: float) -> void:
+	if status_box != null and is_instance_valid(entity):
+		status_box.global_position = entity.global_position + STATUS_OFFSET
+	if status_label != null:
+		var current := animation_player.current_animation
+		if current != last_status:
+			last_status = current
+			status_label.text = current
+
 	if not falling:
 		return
 	var visual := entity.get_node_or_null("Visual") as Node2D

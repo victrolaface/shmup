@@ -197,7 +197,7 @@ _data = {
 }
 
 [node name="BossWallstreet" type="Area2D" unique_id=798928833 groups=["enemies", "sub_boss"]]
-scale = Vector2(1.6, 1.6)
+scale = Vector2(1.8, 1.8)
 collision_layer = 2
 
 [node name="Visual" type="Polygon2D" parent="." unique_id=136564070]
