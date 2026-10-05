@@ -1,58 +1,63 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene format=3 uid="uid://clfopy6xi0w5g"]
 
-[ext_resource type="Script" path="res://components/health_component.gd" id="1"]
-[ext_resource type="Script" path="res://components/hit_flash_component.gd" id="2"]
-[ext_resource type="Script" path="res://components/death_effects_component.gd" id="3"]
-[ext_resource type="Script" path="res://components/drop_component.gd" id="4"]
-[ext_resource type="Script" path="res://components/approach_stop_component.gd" id="5"]
-[ext_resource type="Script" path="res://components/boss_animation_component.gd" id="7"]
-[ext_resource type="Script" path="res://components/overlap_damage_component.gd" id="20"]
-[ext_resource type="Script" path="res://components/danmaku_component.gd" id="21"]
-[ext_resource type="Script" path="res://components/boss_morph_component.gd" id="22"]
+[ext_resource type="Script" uid="uid://bpaqbwhvxyci1" path="res://components/health_component.gd" id="1"]
+[ext_resource type="Script" uid="uid://qd00g4a3rxcv" path="res://components/hit_flash_component.gd" id="2"]
+[ext_resource type="Script" uid="uid://do5lruqxe8qqr" path="res://components/death_effects_component.gd" id="3"]
+[ext_resource type="Script" uid="uid://b3il0va8kmlir" path="res://components/drop_component.gd" id="4"]
+[ext_resource type="Script" uid="uid://dlgmneil1m37o" path="res://components/approach_stop_component.gd" id="5"]
+[ext_resource type="Script" uid="uid://c8hy6hnxuok55" path="res://components/boss_animation_component.gd" id="7"]
+[ext_resource type="Script" uid="uid://thinpjiaj75l" path="res://components/overlap_damage_component.gd" id="20"]
+[ext_resource type="Script" uid="uid://crr76ynldm2j4" path="res://components/danmaku_component.gd" id="21"]
+[ext_resource type="Script" uid="uid://gt486q7ljmvd" path="res://components/boss_morph_component.gd" id="22"]
+[ext_resource type="Script" uid="uid://bnhagb30j4fss" path="res://components/impact_effects_component.gd" id="23"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 260.0
 
-[node name="BossThree" type="Area2D" groups=["enemies", "sub_boss"]]
+[node name="BossThree" type="Area2D" unique_id=1041336296 groups=["enemies", "sub_boss"]]
 collision_layer = 2
 
-[node name="Visual" type="Polygon2D" parent="."]
+[node name="Visual" type="Polygon2D" parent="." unique_id=792520284]
 color = Color(0.5, 0.15, 0.6, 1)
 polygon = PackedVector2Array(270, 0, 191, 191, 0, 270, -191, 191, -270, 0, -191, -191, 0, -270, 191, -191)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=399630857]
 shape = SubResource("CircleShape2D_1")
 
-[node name="HurtBox" type="Area2D" parent="."]
+[node name="HurtBox" type="Area2D" parent="." unique_id=519285688]
 collision_layer = 0
-collision_mask = 1
 monitorable = false
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox" unique_id=369381434]
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=317103283]
 
-[node name="OverlapDamageComponent" type="Node" parent="."]
+[node name="OverlapDamageComponent" type="Node" parent="." unique_id=1475501652]
 script = ExtResource("20")
 
-[node name="BossMorphComponent" type="Node" parent="."]
+[node name="BossMorphComponent" type="Node" parent="." unique_id=1562891318]
 script = ExtResource("22")
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=158926276]
 script = ExtResource("1")
-max_health = 2300
+max_health = 2480
 free_on_death = false
 
-[node name="HitFlashComponent" type="Node" parent="."]
+[node name="HitFlashComponent" type="Node" parent="." unique_id=1501121687]
 script = ExtResource("2")
 
-[node name="DeathEffectsComponent" type="Node" parent="."]
+[node name="ImpactEffectsComponent" type="Node" parent="." unique_id=1239055807]
+script = ExtResource("23")
+offset_radius = 240.0
+
+[node name="DeathEffectsComponent" type="Node" parent="." unique_id=2065969236]
 script = ExtResource("3")
 score_value = 1500
 spawn_explosion = false
 spawn_smoke = false
+spawn_blood = true
 
-[node name="DropComponent" type="Node" parent="."]
+[node name="DropComponent" type="Node" parent="." unique_id=757298848]
 script = ExtResource("4")
 charge_count = 8
 guaranteed_large_charges = 3
@@ -61,7 +66,7 @@ heart_chance = 0.0
 guaranteed_hearts = 2
 scatter = 450.0
 
-[node name="ApproachStopComponent" type="Node" parent="."]
+[node name="ApproachStopComponent" type="Node" parent="." unique_id=2051142486]
 script = ExtResource("5")
 approach_speed = 260.0
 stop_x_min = 1850.0
@@ -69,10 +74,10 @@ stop_x_max = 1850.0
 hover_amplitude = 90.0
 hover_frequency = 0.8
 
-[node name="BossAnimationComponent" type="Node" parent="."]
+[node name="BossAnimationComponent" type="Node" parent="." unique_id=808135458]
 script = ExtResource("7")
 
-[node name="DanmakuComponent" type="Node" parent="."]
+[node name="DanmakuComponent" type="Node" parent="." unique_id=1447137359]
 script = ExtResource("21")
 preset = 3
 bullet_cap = 1100

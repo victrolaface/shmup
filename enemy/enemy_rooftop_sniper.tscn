@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://components/health_component.gd" id="1"]
 [ext_resource type="Script" path="res://components/hit_flash_component.gd" id="2"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" path="res://components/wave_move_component.gd" id="7"]
 [ext_resource type="Script" path="res://components/shooter_component.gd" id="8"]
 [ext_resource type="Script" path="res://components/perch_component.gd" id="9"]
+[ext_resource type="Script" path="res://components/ambient_explosion_component.gd" id="10"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 16.0
@@ -39,6 +40,12 @@ score_value = 15
 explosion_radius_range = Vector2(12, 22)
 explosion_duration = 0.22
 smoke_radius = 14.0
+
+[node name="AmbientExplosionComponent" type="Node" parent="."]
+script = ExtResource("10")
+min_radius = 3.0
+max_radius = 8.0
+offset_radius = 10.0
 
 [node name="DropComponent" type="Node" parent="."]
 script = ExtResource("4")

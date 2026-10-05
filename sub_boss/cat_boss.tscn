@@ -10,6 +10,7 @@
 [ext_resource type="Script" uid="uid://thinpjiaj75l" path="res://components/overlap_damage_component.gd" id="20"]
 [ext_resource type="Script" uid="uid://crr76ynldm2j4" path="res://components/danmaku_component.gd" id="21"]
 [ext_resource type="Texture2D" uid="uid://beof4krivfk8s" path="res://sub_boss/images/cat boss.png" id="30"]
+[ext_resource type="Script" path="res://components/impact_effects_component.gd" id="31"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 324.0
@@ -256,11 +257,15 @@ script = ExtResource("20")
 
 [node name="HealthComponent" type="Node" parent="." unique_id=1340149171]
 script = ExtResource("1")
-max_health = 3000
+max_health = 3240
 free_on_death = false
 
 [node name="HitFlashComponent" type="Node" parent="." unique_id=500998656]
 script = ExtResource("2")
+
+[node name="ImpactEffectsComponent" type="Node" parent="."]
+script = ExtResource("31")
+offset_radius = 170.0
 
 [node name="DeathEffectsComponent" type="Node" parent="." unique_id=877217961]
 script = ExtResource("3")
@@ -269,6 +274,8 @@ spawn_explosion = false
 spawn_smoke = false
 burst_count = 110
 burst_duration = 5.2
+spawn_blood = true
+burst_shake = 0.18
 
 [node name="DropComponent" type="Node" parent="." unique_id=1597667604]
 script = ExtResource("4")

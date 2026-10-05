@@ -11,6 +11,8 @@
 [ext_resource type="Script" path="res://spawner/ceiling_spawner.gd" id="9"]
 [ext_resource type="Script" path="res://screen_shake_camera.gd" id="10"]
 [ext_resource type="PackedScene" path="res://background/background.tscn" id="11"]
+[ext_resource type="PackedScene" path="res://enemy/enemy.tscn" id="12"]
+[ext_resource type="PackedScene" path="res://enemy/enemy_sine_light.tscn" id="13"]
 
 [node name="main" type="Node2D" unique_id=392794174]
 script = ExtResource("1")
@@ -37,6 +39,17 @@ script = ExtResource("5")
 
 [node name="SwarmSpawner" type="Node2D" parent="Entities"]
 script = ExtResource("7")
+
+[node name="BossPopcornSpawner" type="Node2D" parent="Entities"]
+script = ExtResource("3")
+enemy_scenes = [ExtResource("12"), ExtResource("13")]
+spawn_interval_start = 7.0
+spawn_interval_min = 5.0
+ramp_duration = 1.0
+medium_chance = 0.0
+medium_random_chance = 0.0
+popcorn_extra_max = 1
+popcorn_extra_spread = 100.0
 
 [node name="ObstructionSpawner" type="Node2D" parent="Entities"]
 script = ExtResource("8")

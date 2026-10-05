@@ -134,6 +134,9 @@ func _on_died() -> void:
 			var explosion := EXPLOSION_SCENE.instantiate() as Node2D
 			explosion.set("min_radius", 80.0)
 			explosion.set("max_radius", 200.0)
-			explosion.global_position = center + Vector2.from_angle(randf() * TAU) * randf_range(0.0, 260.0)
+			var spot := center + Vector2.from_angle(randf() * TAU) * randf_range(0.0, 260.0)
+			explosion.global_position = spot
 			parent.add_child(explosion)
+			ScreenShakeCamera.shake_view(parent, 0.16)
+			BloodHose.spray(parent, spot, Vector2.UP.rotated(randf_range(-1.3, 1.3)), randf_range(900.0, 1400.0), randf_range(0.3, 0.55), 140.0, entity)
 		)

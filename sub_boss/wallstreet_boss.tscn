@@ -10,6 +10,7 @@
 [ext_resource type="Script" path="res://components/overlap_damage_component.gd" id="20"]
 [ext_resource type="Script" path="res://components/danmaku_component.gd" id="21"]
 [ext_resource type="Texture2D" path="res://sub_boss/images/wallstreet.png" id="30"]
+[ext_resource type="Script" path="res://components/impact_effects_component.gd" id="31"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 300.0
@@ -228,11 +229,15 @@ script = ExtResource("20")
 
 [node name="HealthComponent" type="Node" parent="." unique_id=1358768132]
 script = ExtResource("1")
-max_health = 2600
+max_health = 2800
 free_on_death = false
 
 [node name="HitFlashComponent" type="Node" parent="." unique_id=761239505]
 script = ExtResource("2")
+
+[node name="ImpactEffectsComponent" type="Node" parent="."]
+script = ExtResource("31")
+offset_radius = 150.0
 
 [node name="DeathEffectsComponent" type="Node" parent="." unique_id=2037374682]
 script = ExtResource("3")
@@ -242,6 +247,8 @@ spawn_smoke = false
 burst_count = 130
 burst_radius_range = Vector2(40, 260)
 burst_spread = Vector2(560, 420)
+spawn_blood = true
+burst_shake = 0.18
 burst_duration = 5.2
 
 [node name="DropComponent" type="Node" parent="." unique_id=304249691]

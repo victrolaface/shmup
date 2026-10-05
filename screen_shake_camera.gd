@@ -16,6 +16,11 @@ func _ready() -> void:
 func shake(amount: float) -> void:
 	trauma = minf(trauma + amount, 1.0)
 
+static func shake_view(node: Node, amount: float) -> void:
+	var active := node.get_viewport().get_camera_2d() as ScreenShakeCamera
+	if active != null:
+		active.shake(amount)
+
 func _process(delta: float) -> void:
 	if trauma <= 0.0:
 		if offset != Vector2.ZERO or rotation != 0.0:

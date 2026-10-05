@@ -34,7 +34,7 @@ func _spawn_cluster() -> void:
 		var depth := randf_range(depth_range.x, depth_range.y)
 		_spawn_polygon(left_edge + width * 0.5, width, depth)
 		left_edge += width + randf_range(neighbor_offset_range.x, neighbor_offset_range.y)
-	var gap := randf_range(gap_range.x, gap_range.y) * interval_scale * Conductor.obstruction_scale()
+	var gap := randf_range(gap_range.x, gap_range.y) * interval_scale * Conductor.obstruction_scale() * Game.rank_spawn_interval_scale()
 	next_spawn_in = (left_edge - spawn_edge_x + gap) / scroll_speed
 
 func _spawn_polygon(center_x: float, width: float, depth: float) -> void:

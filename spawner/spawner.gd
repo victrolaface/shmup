@@ -18,6 +18,10 @@ var interval_scale: float = 1.0
 @export var medium_chance: float = 0.08
 @export var medium_random_scene: PackedScene = preload("res://enemy/enemy_medium_random.tscn")
 @export var medium_random_chance: float = 0.04
+## As the combo/rank climbs, extra popcorn fodder spawns alongside the
+## regular one, up to this many additional units at max rank.
+@export var popcorn_extra_max: int = 1
+@export var popcorn_extra_spread: float = 140.0
 
 var spawning: bool = true
 var elapsed: float = 0.0
@@ -31,7 +35,7 @@ func _physics_process(delta: float) -> void:
 	time_since_spawn += delta
 
 	var ramp_t: float = clamp(elapsed / ramp_duration, 0.0, 1.0)
-	var current_interval: float = lerp(spawn_interval_start, spawn_interval_min, ramp_t) * interval_scale * Conductor.spawn_scale()
+	var current_interval: float = lerp(spawn_interval_start, spawn_interval_min, ramp_t) * interval_scale * Conductor.spawn_scale() * Game.rank_spawn_interval_scale()
 
 	if time_since_spawn >= current_interval and Conductor.gate(1):
 		time_since_spawn = 0.0
@@ -47,10 +51,22 @@ func _spawn_enemy() -> void:
 		scene = medium_scene
 	else:
 		is_medium = false
-	var enemy := scene.instantiate() as Node2D
 	var y := randf_range(spawn_y_min, spawn_y_max)
 	if is_medium:
 		y = clamp(y, 250.0, 1190.0)
+	_spawn_at(scene, y)
+	if is_medium:
+		return
+
+	# Popcorn fodder: the bigger the combo gets, the more of these spawn
+	# together in the same wave.
+	var extra := roundi(Game.rank * float(popcorn_extra_max))
+	for i in extra:
+		var extra_y: float = clamp(y + randf_range(-popcorn_extra_spread, popcorn_extra_spread), spawn_y_min, spawn_y_max)
+		_spawn_at(enemy_scenes[randi() % enemy_scenes.size()], extra_y)
+
+func _spawn_at(scene: PackedScene, y: float) -> void:
+	var enemy := scene.instantiate() as Node2D
 	enemy.position = Vector2(spawn_x, y)
 	get_parent().add_child(enemy)
 

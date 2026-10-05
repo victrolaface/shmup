@@ -1,9 +1,9 @@
 extends Node2D
 
 const BOSS_SCENES: Array[PackedScene] = [
-	preload("res://sub_boss/boss_two.tscn"),
-	preload("res://sub_boss/sub_boss_one.tscn"),
-	preload("res://sub_boss/boss_wallstreet.tscn"),
+	preload("res://sub_boss/drone_boss.tscn"),
+	preload("res://sub_boss/cat_boss.tscn"),
+	preload("res://sub_boss/wallstreet_boss.tscn"),
 ]
 const MORPH_BOSS := preload("res://sub_boss/boss_three.tscn")
 const STAGE_BOSS_OVERRIDES := {"2-1": preload("res://sub_boss/boss_morph_one.tscn"), "2-2": MORPH_BOSS, "2-3": MORPH_BOSS}
@@ -58,6 +58,7 @@ const COMBO_BAR_WIDTH := 240.0
 @onready var swarm_spawner: SwarmSpawner = $Entities/SwarmSpawner
 @onready var obstruction_spawner: ObstructionSpawner = $Entities/ObstructionSpawner
 @onready var ceiling_spawner: CeilingSpawner = $Entities/CeilingSpawner
+@onready var boss_popcorn_spawner: Spawner = $Entities/BossPopcornSpawner
 
 var is_paused: bool = false
 var is_game_over: bool = false
@@ -84,12 +85,10 @@ func _ready() -> void:
 	_on_health_changed(player.health.health, player.health.max_health)
 
 	sub_boss_bar.visible = false
+	boss_popcorn_spawner.stop_spawning()
 	_show_level_banner()
 	_set_spawn_interval_scale(LEVEL_1_1_INTERVAL_SCALE)
 	Conductor.start_song()
-
-
-
 
 
 
@@ -192,6 +191,7 @@ func _on_sub_boss_timer_timeout() -> void:
 	swarm_spawner.stop_spawning()
 	obstruction_spawner.stop_spawning()
 	ceiling_spawner.stop_spawning()
+	boss_popcorn_spawner.resume_spawning()
 
 	var boss_scene: PackedScene = STAGE_BOSS_OVERRIDES.get("%d-%d" % [level_major, level_minor], BOSS_SCENES[mini(level_minor, BOSS_SCENES.size()) - 1])
 	var sub_boss := boss_scene.instantiate() as Node2D
@@ -209,8 +209,9 @@ func _on_sub_boss_health_changed(current: int, max_health: int) -> void:
 
 func _on_sub_boss_defeated() -> void:
 	kill_boss_button.visible = false
-	camera.shake(1.0)
+	camera.shake(0.5)
 	sub_boss_bar.visible = false
+	boss_popcorn_spawner.stop_spawning()
 	await get_tree().create_timer(SHOP_DELAY).timeout
 	if is_game_over:
 		return
@@ -307,4 +308,5 @@ func _on_kill_boss_pressed() -> void:
 	for boss in get_tree().get_nodes_in_group("sub_boss"):
 		var health := HealthComponent.find(boss)
 		if health != null and not health.dead:
+			health.invulnerable = false
 			health.take_damage(health.health)

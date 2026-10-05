@@ -13,6 +13,9 @@ signal progress_changed(progress: float)
 @export var wave_interval: float = 0.3
 @export var bullet_speed: float = 1000.0
 @export var bombardment_min_level: int = 3
+## Screen shake when the blast goes off: base + per_level * charge level.
+@export var blast_shake_base: float = 0.4
+@export var blast_shake_per_level: float = 0.1
 
 var progress: float = 0.0
 var charge: int = 0
@@ -58,6 +61,7 @@ func _unleash() -> void:
 	var damage := damage_per_charge * level
 	_spawn_blast(radius)
 	_clear_nearby(radius, damage)
+	ScreenShakeCamera.shake_view(entity, blast_shake_base + blast_shake_per_level * float(level))
 
 	nova_damage = damage
 	nova_elapsed = 0.0

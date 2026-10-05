@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://components/health_component.gd" id="1"]
 [ext_resource type="Script" path="res://components/hit_flash_component.gd" id="2"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" path="res://components/offscreen_cull_component.gd" id="6"]
 [ext_resource type="Script" path="res://components/wave_move_component.gd" id="7"]
 [ext_resource type="Script" path="res://components/shooter_component.gd" id="8"]
+[ext_resource type="Script" path="res://components/ambient_explosion_component.gd" id="9"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 22.0
@@ -35,6 +36,9 @@ script = ExtResource("2")
 [node name="DeathEffectsComponent" type="Node" parent="."]
 script = ExtResource("3")
 score_value = 10
+
+[node name="AmbientExplosionComponent" type="Node" parent="."]
+script = ExtResource("9")
 
 [node name="DropComponent" type="Node" parent="."]
 script = ExtResource("4")

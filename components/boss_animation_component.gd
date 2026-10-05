@@ -51,7 +51,33 @@ func _ready() -> void:
 	health.damaged.connect(_on_damaged)
 	health.died.connect(_on_died)
 
-	animation_player.play("idle")
+	# Bosses can't be hurt during their introduction; they become damageable
+	# once they settle into their idle state at the end of the approach.
+	var approach := Component.of(entity, "ApproachStopComponent") as ApproachStopComponent
+	if approach != null and not approach.has_arrived:
+		health.invulnerable = true
+		approach.arrived.connect(_on_arrived.bind(health))
+
+	if approach != null and not approach.has_arrived and animation_player.has_animation("intro"):
+		_play_intro(approach)
+	else:
+		animation_player.play("idle")
+
+# The flight part of the intro clip (up to its "flight_end" metadata, or the
+# whole clip if unset) is stretched to last exactly as long as the boss's
+# flight to its stopping point. On arrival playback returns to normal speed,
+# so the rest of the clip (the settle into idle) plays once he has stopped.
+func _play_intro(approach: ApproachStopComponent) -> void:
+	var intro := animation_player.get_animation("intro")
+	var flight_end: float = intro.get_meta("flight_end", intro.length)
+	var travel_time := (entity.position.x - approach.stop_x) / approach.approach_speed
+	if approach.stop_x > 0.0 and travel_time > 0.1:
+		animation_player.speed_scale = flight_end / travel_time
+	animation_player.play("intro")
+
+func _on_arrived(health: HealthComponent) -> void:
+	health.invulnerable = false
+	animation_player.speed_scale = 1.0
 
 func _on_attack_started(attack: int) -> void:
 	if not dying:
@@ -67,6 +93,7 @@ func _on_damaged(_amount: int) -> void:
 
 func _on_died() -> void:
 	dying = true
+	animation_player.speed_scale = 1.0
 	for child in entity.get_children():
 		if child is Component and child != self:
 			child.process_mode = Node.PROCESS_MODE_DISABLED
@@ -78,6 +105,8 @@ func _on_died() -> void:
 		_fall_offscreen()
 
 func _on_animation_finished(animation_name: StringName) -> void:
+	if animation_name == &"intro":
+		animation_player.speed_scale = 1.0
 	if animation_name == &"death" and not fall_on_death:
 		entity.queue_free()
 	elif not dying:

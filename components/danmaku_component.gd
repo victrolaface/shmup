@@ -130,7 +130,7 @@ func _can_run() -> bool:
 
 func _density() -> float:
 	var wounded := 1.0 + 0.4 * (1.0 - float(health.health) / float(health.max_health))
-	return Conductor.bullet_density() * density_scale * wounded
+	return Conductor.bullet_density() * density_scale * wounded * Game.rank_density_scale()
 
 func _on_bar_started(_bar: int) -> void:
 	if not _can_run():
@@ -236,7 +236,7 @@ func _fire(direction: Vector2, speed: float, tint: Color, dot_scale: float = 1.0
 	entity.get_parent().add_child(bullet)
 	bullet.global_position = entity.global_position if at == Vector2.INF else at
 	bullet.direction = direction
-	bullet.speed = speed * speed_scale
+	bullet.speed = speed * speed_scale * Game.rank_bullet_speed_scale()
 	bullet.wave_amplitude = wave_amplitude
 	bullet.wave_frequency = wave_frequency
 	bullet.wave_phase = wave_phase

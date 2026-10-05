@@ -13,6 +13,7 @@ signal god_mode_changed(active: bool)
 var health: int
 var invincible_time: float = 0.0
 var god_mode: bool = false
+var invulnerable: bool = false
 var dead: bool = false
 
 static func find(target: Node) -> HealthComponent:
@@ -26,7 +27,7 @@ func _physics_process(delta: float) -> void:
 		invincible_time = max(invincible_time - delta, 0.0)
 
 func take_damage(amount: int) -> void:
-	if dead or god_mode or invincible_time > 0.0:
+	if dead or god_mode or invulnerable or invincible_time > 0.0:
 		return
 	health -= amount
 	damaged.emit(amount)

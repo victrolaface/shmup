@@ -105,8 +105,9 @@ func _physics_process(delta: float) -> void:
 		return
 	pattern_time += delta
 	timer += delta
-	if timer >= shot_interval:
-		timer -= shot_interval
+	var effective_interval := shot_interval * Game.rank_spawn_interval_scale()
+	if timer >= effective_interval:
+		timer -= effective_interval
 		if burst_size > 0 and shots_in_burst == 0:
 			burst_started.emit()
 		_fire()
@@ -226,7 +227,7 @@ func _spawn_bullet(direction: Vector2, amplitude: float = 0.0, frequency: float 
 	entity.get_parent().add_child(bullet)
 	bullet.global_position = entity.global_position if at == Vector2.INF else at
 	bullet.direction = direction
-	bullet.speed = bullet_speed
+	bullet.speed = bullet_speed * Game.rank_bullet_speed_scale()
 	bullet.wave_amplitude = amplitude
 	bullet.wave_frequency = frequency
 	bullet.wave_phase = phase

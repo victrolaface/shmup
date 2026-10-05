@@ -28,14 +28,16 @@ func _physics_process(delta: float) -> void:
 	time_since_spawn += delta
 
 	var ramp_t: float = clamp(elapsed / ramp_duration, 0.0, 1.0)
-	var current_interval: float = lerp(spawn_interval_start, spawn_interval_min, ramp_t) * interval_scale * Conductor.spawn_scale()
+	var current_interval: float = lerp(spawn_interval_start, spawn_interval_min, ramp_t) * interval_scale * Conductor.spawn_scale() * Game.rank_spawn_interval_scale()
 
 	if time_since_spawn >= current_interval and Conductor.gate(4):
 		time_since_spawn = 0.0
 		_spawn_swarm()
 
 func _spawn_swarm() -> void:
-	var offsets := _wedge_offsets() if randf() < 0.5 else _grid_offsets()
+	# The bigger the combo, the bigger the swarm.
+	var extra := roundi(Game.rank * 1.0)
+	var offsets := _wedge_offsets(extra) if randf() < 0.5 else _grid_offsets(extra)
 	var center_y := randf_range(center_y_min, center_y_max)
 	var first_leg := randf_range(first_leg_range.x, first_leg_range.y)
 	var second_leg: float = min(randf_range(second_leg_range.x, second_leg_range.y), spawn_x - min_final_x - first_leg)
@@ -51,18 +53,19 @@ func _spawn_swarm() -> void:
 		move.pause_durations = pauses
 		get_parent().add_child(unit)
 
-func _wedge_offsets() -> Array[Vector2]:
+func _wedge_offsets(extra_rings: int = 0) -> Array[Vector2]:
 	var offsets: Array[Vector2] = [Vector2.ZERO]
-	for i in range(1, 5):
+	for i in range(1, 5 + extra_rings):
 		offsets.append(Vector2(unit_spacing * 0.8 * i, -unit_spacing * 0.7 * i))
 		offsets.append(Vector2(unit_spacing * 0.8 * i, unit_spacing * 0.7 * i))
 	return offsets
 
-func _grid_offsets() -> Array[Vector2]:
+func _grid_offsets(extra_rows: int = 0) -> Array[Vector2]:
 	var offsets: Array[Vector2] = []
+	var rows := 4 + extra_rows
 	for column in 3:
-		for row in 4:
-			var y := (float(row) - 1.5) * unit_spacing + (unit_spacing * 0.5 if column % 2 == 1 else 0.0)
+		for row in rows:
+			var y := (float(row) - float(rows - 1) * 0.5) * unit_spacing + (unit_spacing * 0.5 if column % 2 == 1 else 0.0)
 			offsets.append(Vector2(float(column) * unit_spacing, y))
 	return offsets
 

@@ -10,6 +10,9 @@ const EXPLOSION_SCENE := preload("res://effects/explosion.tscn")
 @export var column_interval: float = 0.08
 @export var blast_radius: float = 140.0
 @export var damage_per_level: int = 4
+## Screen shake added by each column that detonates; the columns go off 80ms
+## apart so this builds into a rumble that rolls across the screen.
+@export var column_shake: float = 0.15
 
 var active: bool = false
 var elapsed: float = 0.0
@@ -43,6 +46,7 @@ func _physics_process(delta: float) -> void:
 func _detonate_column(index: int) -> void:
 	var x := first_column_x + float(index) * column_spacing
 	var parent := entity.get_parent()
+	ScreenShakeCamera.shake_view(entity, column_shake)
 
 	for y in row_ys:
 		var explosion := EXPLOSION_SCENE.instantiate() as Node2D

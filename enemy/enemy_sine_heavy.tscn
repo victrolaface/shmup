@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://d0dumfvhdp2nm" path="res://components/offscreen_cull_component.gd" id="6"]
 [ext_resource type="Script" uid="uid://d13ud6l8r4nxo" path="res://components/wave_move_component.gd" id="7"]
 [ext_resource type="Script" uid="uid://bnl56a3gaq4yk" path="res://components/shooter_component.gd" id="8"]
+[ext_resource type="Script" path="res://components/ambient_explosion_component.gd" id="9"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 22.0
@@ -32,6 +33,9 @@ script = ExtResource("2")
 [node name="DeathEffectsComponent" type="Node" parent="." unique_id=749575937]
 script = ExtResource("3")
 score_value = 15
+
+[node name="AmbientExplosionComponent" type="Node" parent="."]
+script = ExtResource("9")
 
 [node name="DropComponent" type="Node" parent="." unique_id=1228905685]
 script = ExtResource("4")

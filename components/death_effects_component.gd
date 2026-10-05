@@ -14,6 +14,15 @@ const SMOKE_SCENE := preload("res://effects/smoke.tscn")
 @export var burst_radius_range: Vector2 = Vector2(25.0, 170.0)
 @export var burst_spread: Vector2 = Vector2(260.0, 320.0)
 @export var burst_duration: float = 1.4
+@export var spawn_blood: bool = false
+@export var hose_count: int = 3
+@export var hose_speed_range: Vector2 = Vector2(1100.0, 1700.0)
+@export var hose_duration_range: Vector2 = Vector2(1.4, 2.0)
+@export var hose_rate: float = 210.0
+## Chance that each staggered burst explosion also spurts a short jet of blood.
+@export var burst_spurt_chance: float = 0.25
+## Screen rumble per staggered burst explosion, scaled by that explosion's size.
+@export var burst_shake: float = 0.0
 
 func _ready() -> void:
 	HealthComponent.find(entity).died.connect(_on_died)
@@ -33,6 +42,8 @@ func _on_died() -> void:
 		smoke.set("radius", smoke_radius)
 		smoke.global_position = entity.global_position
 		parent.add_child(smoke)
+	if spawn_blood:
+		_open_hoses(parent)
 	if burst_count > 0:
 		_explosion_burst(parent, entity.global_position)
 
@@ -52,4 +63,22 @@ func _explosion_burst(parent: Node, origin: Vector2) -> void:
 			explosion.set("duration", lerpf(0.3, 0.6, size / burst_radius_range.y))
 			var base := entity.global_position if is_instance_valid(entity) else origin
 			explosion.global_position = base + offset
-			parent.add_child(explosion))
+			parent.add_child(explosion)
+			if burst_shake > 0.0:
+				ScreenShakeCamera.shake_view(parent, burst_shake * size / burst_radius_range.y)
+			if spawn_blood and randf() < burst_spurt_chance:
+				var attach := entity if is_instance_valid(entity) else null
+				BloodHose.spray(parent, base + offset, _jet_direction(), randf_range(900.0, 1400.0), randf_range(0.25, 0.5), hose_rate, attach))
+
+## The killing blow: several jets from the body, fanning out to both sides,
+## and staying attached so they keep pumping while the body falls away.
+func _open_hoses(parent: Node) -> void:
+	for i in hose_count:
+		var side := -1.0 if i % 2 == 0 else 1.0
+		var aim := Vector2.UP.rotated(side * randf_range(0.25, 1.2))
+		var jet_speed := randf_range(hose_speed_range.x, hose_speed_range.y)
+		var jet_duration := randf_range(hose_duration_range.x, hose_duration_range.y)
+		BloodHose.spray(parent, entity.global_position, aim, jet_speed, jet_duration, hose_rate, entity)
+
+func _jet_direction() -> Vector2:
+	return Vector2.UP.rotated(randf_range(-1.3, 1.3))

@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://components/health_component.gd" id="1"]
 [ext_resource type="Script" path="res://components/hit_flash_component.gd" id="2"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" path="res://components/approach_stop_component.gd" id="7"]
 [ext_resource type="Script" path="res://components/shooter_component.gd" id="8"]
 [ext_resource type="Script" path="res://components/danmaku_component.gd" id="21"]
+[ext_resource type="Script" path="res://components/ambient_explosion_component.gd" id="22"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 40.0
@@ -36,6 +37,9 @@ script = ExtResource("2")
 [node name="DeathEffectsComponent" type="Node" parent="."]
 script = ExtResource("3")
 score_value = 40
+
+[node name="AmbientExplosionComponent" type="Node" parent="."]
+script = ExtResource("22")
 
 [node name="DropComponent" type="Node" parent="."]
 script = ExtResource("4")
