@@ -42,25 +42,26 @@ func _ready() -> void:
 	flash_material.set_shader_parameter("flash_color", flash_color)
 	flash_material.set_shader_parameter("flash_amount", 0.0)
 
+	# Sprite pieces carried by a Visual polygon each get a silhouette overlay.
 	var visual := Component.of(entity, "Visual") as Polygon2D
 	if visual != null:
-		# A Visual polygon carrying sprite pieces: flash each sprite. Without
-		# sprites, the polygon itself is tinted.
 		for child in visual.get_children():
 			if child is Sprite2D:
 				_add_sprite_overlay(child as Sprite2D)
-		if overlay_count == 0:
-			_track_tint(visual)
-	else:
-		# A rig of polygons somewhere under the entity: textured pieces get a
-		# silhouette overlay, untextured ones are tinted directly.
-		var pieces: Array[Polygon2D] = []
-		_collect_polygons(entity, pieces)
-		for piece in pieces:
-			if piece.texture != null:
-				_add_polygon_overlay(piece)
-			else:
-				_track_tint(piece)
+	# A rig of polygons anywhere else under the entity (alongside or instead of a
+	# Visual): textured pieces get an overlay, untextured ones are tinted.
+	var pieces: Array[Polygon2D] = []
+	_collect_polygons(entity, pieces)
+	for piece in pieces:
+		if piece == visual:
+			continue
+		if piece.texture != null:
+			_add_polygon_overlay(piece)
+		else:
+			_track_tint(piece)
+	# A plain Visual polygon with nothing else to flash is tinted itself.
+	if visual != null and overlay_count == 0 and tinted.is_empty():
+		_track_tint(visual)
 	health.damaged.connect(func(_amount: int) -> void: hit_timer = duration)
 
 func _collect_polygons(node: Node, into: Array[Polygon2D]) -> void:

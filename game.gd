@@ -4,6 +4,7 @@ signal score_changed(new_score: int)
 signal currency_changed(new_currency: int)
 signal combo_changed(combo: int, multiplier: float)
 signal rank_changed(rank: float)
+signal kill_registered(base_score: int, multiplier: float)
 signal game_over
 
 const COMBO_WINDOW := 12.0
@@ -62,6 +63,7 @@ func register_kill(base_score: int) -> void:
 	var multiplier := combo_multiplier()
 	add_score(roundi(float(base_score) * multiplier))
 	combo_changed.emit(combo, multiplier)
+	kill_registered.emit(base_score, multiplier)
 	_update_rank_target()
 
 func combo_multiplier() -> float:

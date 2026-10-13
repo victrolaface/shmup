@@ -90,13 +90,6 @@ func _ready() -> void:
 	_set_spawn_interval_scale(LEVEL_1_1_INTERVAL_SCALE)
 	Conductor.start_song()
 
-
-
-
-
-
-
-
 func _set_spawn_interval_scale(interval_scale: float) -> void:
 	spawner.interval_scale = interval_scale
 	formation_spawner.interval_scale = interval_scale

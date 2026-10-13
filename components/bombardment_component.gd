@@ -9,7 +9,7 @@ const EXPLOSION_SCENE := preload("res://effects/explosion.tscn")
 @export var row_spacing: float = 180.0
 @export var column_interval: float = 0.08
 @export var blast_radius: float = 140.0
-@export var damage_per_level: int = 4
+@export var damage_per_level: int = 2
 ## Screen shake added by each column that detonates; the columns go off 80ms
 ## apart so this builds into a rumble that rolls across the screen.
 @export var column_shake: float = 0.15

@@ -7,12 +7,20 @@ signal progress_changed(progress: float)
 @export var max_charge: int = 3
 @export var base_radius: float = 300.0
 @export var radius_step: float = 200.0
-@export var damage_per_charge: int = 4
-@export var waves_by_level: PackedInt32Array = PackedInt32Array([2, 4, 6])
-@export var bullets_per_wave_by_level: PackedInt32Array = PackedInt32Array([36, 48, 60])
+@export var damage_per_charge: int = 3
+@export var waves_by_level: PackedInt32Array = PackedInt32Array([2, 3, 4])
+@export var bullets_per_wave_by_level: PackedInt32Array = PackedInt32Array([24, 32, 40])
 @export var wave_interval: float = 0.3
 @export var bullet_speed: float = 1000.0
 @export var bombardment_min_level: int = 3
+## Kills charge the meter: the enemy's score value times this, times the combo
+## multiplier, capped per kill so a boss fills at most `kill_charge_cap`.
+@export var kill_charge_per_point: float = 0.004
+@export var kill_charge_cap: float = 1.0
+## Enemy bullets that whizz past within this distance of the player (without
+## hitting) give a small trickle of charge, once per bullet.
+@export var graze_radius: float = 70.0
+@export var graze_charge: float = 0.01
 ## Screen shake when the blast goes off: base + per_level * charge level.
 @export var blast_shake_base: float = 0.4
 @export var blast_shake_per_level: float = 0.1
@@ -29,6 +37,22 @@ var bombardment: BombardmentComponent
 
 func _ready() -> void:
 	bombardment = Component.of(entity, "BombardmentComponent") as BombardmentComponent
+	Game.kill_registered.connect(_on_kill_registered)
+
+## Kills made by the super itself don't feed the next one.
+func _on_kill_registered(base_score: int, multiplier: float) -> void:
+	if nova_active or (bombardment != null and bombardment.active):
+		return
+	grant_charge(minf(float(base_score) * kill_charge_per_point * multiplier, kill_charge_cap))
+
+func _graze() -> void:
+	for node in get_tree().get_nodes_in_group("enemy_bullets"):
+		var bullet := node as Bullet
+		if bullet == null or not is_instance_valid(bullet) or bullet.is_queued_for_deletion() or bullet.has_meta("grazed"):
+			continue
+		if entity.global_position.distance_to(bullet.global_position) <= graze_radius:
+			bullet.set_meta("grazed", true)
+			grant_charge(graze_charge)
 
 func grant_charge(amount: float) -> void:
 	progress = min(progress + amount, float(max_charge))
@@ -36,6 +60,7 @@ func grant_charge(amount: float) -> void:
 	progress_changed.emit(progress)
 
 func _physics_process(delta: float) -> void:
+	_graze()
 	if nova_active:
 		nova_elapsed += delta
 		while waves_spawned < current_wave_count and nova_elapsed >= float(waves_spawned) * wave_interval:
