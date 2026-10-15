@@ -121,7 +121,8 @@ z_index = 1
 
 [node name="HealthComponent" type="Node" parent="." unique_id=448475758]
 script = ExtResource("2")
-invincibility_duration = 2.0
+max_health = 4
+invincibility_duration = 2.5
 free_on_death = false
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=219556811]

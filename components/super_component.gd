@@ -15,12 +15,12 @@ signal progress_changed(progress: float)
 @export var bombardment_min_level: int = 3
 ## Kills charge the meter: the enemy's score value times this, times the combo
 ## multiplier, capped per kill so a boss fills at most `kill_charge_cap`.
-@export var kill_charge_per_point: float = 0.004
+@export var kill_charge_per_point: float = 0.006
 @export var kill_charge_cap: float = 1.0
 ## Enemy bullets that whizz past within this distance of the player (without
 ## hitting) give a small trickle of charge, once per bullet.
-@export var graze_radius: float = 70.0
-@export var graze_charge: float = 0.01
+@export var graze_radius: float = 80.0
+@export var graze_charge: float = 0.015
 ## Screen shake when the blast goes off: base + per_level * charge level.
 @export var blast_shake_base: float = 0.4
 @export var blast_shake_per_level: float = 0.1

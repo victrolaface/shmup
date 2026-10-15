@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cab50v45kmtqy"
-path="res://.godot/imported/cat.jpg-7ca023a81c304a4f59e1506e01da195b.ctex"
+uid="uid://cf8jastgmdmog"
+path="res://.godot/imported/hand-lft.PNG-d44e96cb4de8cffc3c05aac41547446a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sub_boss/images/cat.jpg"
-dest_files=["res://.godot/imported/cat.jpg-7ca023a81c304a4f59e1506e01da195b.ctex"]
+source_file="res://sub_boss/images/wall street boss/hand-lft.PNG"
+dest_files=["res://.godot/imported/hand-lft.PNG-d44e96cb4de8cffc3c05aac41547446a.ctex"]
 
 [params]
 

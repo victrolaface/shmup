@@ -3434,7 +3434,7 @@ script = ExtResource("2_muaun")
 
 [node name="HealthComponent" type="Node" parent="." unique_id=1340149171]
 script = ExtResource("3_xfwek")
-max_health = 3240
+max_health = 1500
 free_on_death = false
 
 [node name="HitFlashComponent" type="Node" parent="." unique_id=500998656]

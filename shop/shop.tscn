@@ -1,0 +1,13 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" uid="uid://brlxdcmo6sxki" path="res://shop/images/shop.png" id="1_shop"]
+
+[node name="Shop" type="Node2D"]
+z_index = -3
+
+[node name="Image" type="Sprite2D" parent="."]
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("1_shop")
+
+[node name="Landing" type="Marker2D" parent="."]
+position = Vector2(-225, 176)

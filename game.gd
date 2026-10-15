@@ -18,9 +18,9 @@ const COMBO_MAX_STEPS := 20
 ## of snapping every time the combo changes.
 const RANK_MAX_COMBO := 40.0
 const RANK_EASE_SPEED := 0.22
-const RANK_SPAWN_INTERVAL_RANGE := Vector2(1.25, 0.82)
-const RANK_DENSITY_RANGE := Vector2(0.8, 1.15)
-const RANK_BULLET_SPEED_RANGE := Vector2(0.85, 1.08)
+const RANK_SPAWN_INTERVAL_RANGE := Vector2(1.45, 1.0)
+const RANK_DENSITY_RANGE := Vector2(0.7, 1.0)
+const RANK_BULLET_SPEED_RANGE := Vector2(0.8, 0.97)
 
 var score: int = 0
 var currency: int = 0

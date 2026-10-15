@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://beof4krivfk8s"
-path="res://.godot/imported/cat boss.png-aaa462dc123d2c5c5cdf36a77586fd19.ctex"
+uid="uid://bu6o87im8pey3"
+path="res://.godot/imported/torso.PNG-d7fbfd5bddd7ab21dcf14d3b72708639.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sub_boss/images/cat boss.png"
-dest_files=["res://.godot/imported/cat boss.png-aaa462dc123d2c5c5cdf36a77586fd19.ctex"]
+source_file="res://sub_boss/images/wall street boss/torso.PNG"
+dest_files=["res://.godot/imported/torso.PNG-d7fbfd5bddd7ab21dcf14d3b72708639.ctex"]
 
 [params]
 

@@ -174,73 +174,67 @@ visible = false
 layout_mode = 3
 anchors_preset = 0
 
-[node name="Dim" type="ColorRect" parent="UI/ShopMenu" unique_id=1939735493]
-layout_mode = 0
-offset_right = 2560.0
-offset_bottom = 1440.0
-color = Color(0, 0, 0, 0.8)
-
 [node name="TitleLabel" type="Label" parent="UI/ShopMenu" unique_id=747893158]
+visible = false
 layout_mode = 0
-offset_left = 880.0
-offset_top = 240.0
-offset_right = 1680.0
-offset_bottom = 380.0
-theme_override_font_sizes/font_size = 96
+offset_left = 60
+offset_top = 14
+offset_right = 700
+offset_bottom = 84
+theme_override_font_sizes/font_size = 52
 text = "SHOP"
-horizontal_alignment = 1
 
 [node name="CoinsLabel" type="Label" parent="UI/ShopMenu" unique_id=1178467388]
 layout_mode = 0
-offset_left = 780.0
-offset_top = 400.0
-offset_right = 1780.0
-offset_bottom = 470.0
-theme_override_font_sizes/font_size = 48
+offset_left = 60
+offset_top = 300
+offset_right = 900
+offset_bottom = 360
+theme_override_font_sizes/font_size = 40
 text = "COINS: 0"
-horizontal_alignment = 1
+horizontal_alignment = 0
 
 [node name="ResultLabel" type="Label" parent="UI/ShopMenu" unique_id=2137846004]
 layout_mode = 0
-offset_left = 780.0
-offset_top = 500.0
-offset_right = 1780.0
-offset_bottom = 570.0
+offset_left = 60
+offset_top = 880
+offset_right = 900
+offset_bottom = 940
 theme_override_font_sizes/font_size = 48
-horizontal_alignment = 1
+horizontal_alignment = 0
 
 [node name="Option0" type="Button" parent="UI/ShopMenu" unique_id=102397624]
 layout_mode = 0
-offset_left = 780.0
-offset_top = 600.0
-offset_right = 1780.0
-offset_bottom = 700.0
-theme_override_font_sizes/font_size = 44
+offset_left = 60
+offset_top = 400
+offset_right = 900
+offset_bottom = 500
+theme_override_font_sizes/font_size = 38
 
 [node name="Option1" type="Button" parent="UI/ShopMenu" unique_id=1990383319]
 layout_mode = 0
-offset_left = 780.0
-offset_top = 720.0
-offset_right = 1780.0
-offset_bottom = 820.0
-theme_override_font_sizes/font_size = 44
+offset_left = 60
+offset_top = 520
+offset_right = 900
+offset_bottom = 620
+theme_override_font_sizes/font_size = 38
 
 [node name="Option2" type="Button" parent="UI/ShopMenu" unique_id=952835975]
 layout_mode = 0
-offset_left = 780.0
-offset_top = 840.0
-offset_right = 1780.0
-offset_bottom = 940.0
-theme_override_font_sizes/font_size = 44
+offset_left = 60
+offset_top = 640
+offset_right = 900
+offset_bottom = 740
+theme_override_font_sizes/font_size = 38
 
 [node name="ContinueButton" type="Button" parent="UI/ShopMenu" unique_id=1757160393]
 layout_mode = 0
-offset_left = 1000.0
-offset_top = 1000.0
-offset_right = 1560.0
-offset_bottom = 1090.0
+offset_left = 60
+offset_top = 780
+offset_right = 900
+offset_bottom = 870
 theme_override_font_sizes/font_size = 44
-text = "CONTINUE"
+text = "LEAVE"
 
 [node name="SuperMeter" type="Node2D" parent="UI" unique_id=41957649]
 position = Vector2(40, 1360)

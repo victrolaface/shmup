@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cex85jpu3nusu"
-path="res://.godot/imported/wallstreet-atlas.png-6b68b5c687eabc72e14141f78b6643f0.ctex"
+uid="uid://dy5c54a5db53q"
+path="res://.godot/imported/card-lft.PNG-d5b12309536c768be69012e6180c35a6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sub_boss/images/wallstreet-atlas.png"
-dest_files=["res://.godot/imported/wallstreet-atlas.png-6b68b5c687eabc72e14141f78b6643f0.ctex"]
+source_file="res://sub_boss/images/wall street boss/card-lft.PNG"
+dest_files=["res://.godot/imported/card-lft.PNG-d5b12309536c768be69012e6180c35a6.ctex"]
 
 [params]
 

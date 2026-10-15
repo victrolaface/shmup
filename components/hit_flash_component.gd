@@ -15,19 +15,24 @@ void fragment() {
 
 static var shared_shader: Shader
 
+## Hits flash this colour; once health is down to `critical_fraction` of its maximum
+## they flash `flash_color` (red) instead. Nothing else glows.
+@export var hit_color: Color = Color(1, 1, 1, 1)
+@export var hit_opacity: float = 0.75
+@export_range(0.0, 1.0) var critical_fraction: float = 0.15
+## The hit flash plays on every Nth hit taken (4 = every fourth hit), starting with the first,
+## so a stream of bullets doesn't strobe the enemy.
+@export var flash_every_nth_hit: int = 4
 @export var flash_color: Color = Color(1, 0.15, 0.15, 1)
 @export var duration: float = 0.15
-@export var stage_1_opacity: float = 0.2
-@export var stage_2_opacity: float = 0.4
-@export var stage_3_opacity: float = 0.55
 
 var health: HealthComponent
 var flash_material: ShaderMaterial
 var overlay_count: int = 0
 var tinted: Array[Polygon2D] = []
 var tinted_base_colors: Array[Color] = []
-var flash_time: float = 0.0
 var hit_timer: float = 0.0
+var hits_taken: int = 0
 
 static func _get_shader() -> Shader:
 	if shared_shader == null:
@@ -62,7 +67,12 @@ func _ready() -> void:
 	# A plain Visual polygon with nothing else to flash is tinted itself.
 	if visual != null and overlay_count == 0 and tinted.is_empty():
 		_track_tint(visual)
-	health.damaged.connect(func(_amount: int) -> void: hit_timer = duration)
+	health.damaged.connect(_on_damaged)
+
+func _on_damaged(_amount: int) -> void:
+	if hits_taken % maxi(flash_every_nth_hit, 1) == 0:
+		hit_timer = duration
+	hits_taken += 1
 
 func _collect_polygons(node: Node, into: Array[Polygon2D]) -> void:
 	for child in node.get_children():
@@ -106,23 +116,13 @@ func _add_polygon_overlay(piece: Polygon2D) -> void:
 	piece.add_child(overlay)
 
 func _physics_process(delta: float) -> void:
-	flash_time += delta
 	hit_timer = max(hit_timer - delta, 0.0)
 
-	var danger: float = 1.0 - clamp(float(health.health) / float(health.max_health), 0.0, 1.0)
-	var flash_frequency := 2.0 + danger * 12.0
-	var ambient_flash := (sin(flash_time * flash_frequency) * 0.5 + 0.5) * danger
-	var instant_flash := hit_timer / duration
-
-	var peak_opacity: float
-	if danger >= 2.0 / 3.0:
-		peak_opacity = stage_3_opacity
-	elif danger >= 1.0 / 3.0:
-		peak_opacity = stage_2_opacity
-	else:
-		peak_opacity = stage_1_opacity
-	var flash: float = max(ambient_flash, instant_flash) * peak_opacity
+	var critical := float(health.health) <= float(health.max_health) * critical_fraction
+	var color := flash_color if critical else hit_color
+	var flash: float = hit_timer / duration * hit_opacity
 	if overlay_count > 0:
+		flash_material.set_shader_parameter("flash_color", color)
 		flash_material.set_shader_parameter("flash_amount", flash)
 	for i in tinted.size():
-		tinted[i].color = tinted_base_colors[i].lerp(flash_color, flash)
+		tinted[i].color = tinted_base_colors[i].lerp(color, flash)

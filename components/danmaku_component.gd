@@ -29,9 +29,18 @@ const DEFAULT_ANIMATIONS := {
 @export var density_scale: float = 1.0
 @export var speed_scale: float = 1.0
 @export var bullet_cap: int = 800
+## Bars of quiet (no bullets, idle animation) after every attack phase; 0 chains the phases back to back.
+@export var rest_bars: int = 0
+## Only the first N attack phases of the preset are used (0 = all of them).
+@export var phase_count: int = 0
 @export var start_on_screen: bool = false
 @export var palette: PackedColorArray = PackedColorArray([Color(0.78, 0.05, 0.88, 1.0), Color(0.6, 0.05, 0.85, 1.0), Color(0.85, 0.05, 0.62, 1.0)])
 @export var muzzle_offsets: PackedVector2Array = PackedVector2Array()
+@export var muzzle_node: NodePath
+## One attack can fire from somewhere else (e.g. a foot) and play its own animation.
+@export var alt_muzzle_node: NodePath
+@export var alt_pattern: int = -1
+@export var alt_animation: String = ""
 @export var muzzle_flash_color: Color = Color(1.0, 0.6, 0.92, 0.9)
 
 var program: Array[Dictionary] = []
@@ -39,6 +48,7 @@ var active: bool = false
 var phase: Dictionary = {}
 var phase_index: int = -1
 var phase_bars_left: int = 0
+var resting: bool = false
 var counter: int = 0
 var gap_phase: float = 0.0
 var health: HealthComponent
@@ -122,6 +132,8 @@ func _build_program() -> void:
 				_combo(Pattern.SNAKE_LINES, Pattern.POLYGON_WAVES, 4),
 				_combo(Pattern.DIAMOND_LATTICE, Pattern.TWIN_VORTEX, 4),
 			]
+	if phase_count > 0 and phase_count < program.size():
+		program = program.slice(0, phase_count)
 
 func _can_run() -> bool:
 	if not active or health.dead or not can_process():
@@ -152,6 +164,12 @@ func _leave_phase() -> void:
 			shooter.stop()
 
 func _enter_next_phase() -> void:
+	if rest_bars > 0 and not resting and not phase.is_empty():
+		resting = true
+		phase = {"pattern": -1, "bars": rest_bars}
+		phase_bars_left = rest_bars
+		return
+	resting = false
 	phase_index = (phase_index + 1) % program.size()
 	phase = program[phase_index]
 	phase_bars_left = int(phase["bars"])
@@ -167,12 +185,12 @@ func _enter_next_phase() -> void:
 func _play_animation() -> void:
 	if animation_player == null or health.dead or phase["pattern"] == Pattern.SHOOTER:
 		return
-	var animation: String = DEFAULT_ANIMATIONS.get(phase["pattern"], "")
+	var animation: String = alt_animation if _uses_alt() and alt_animation != "" else DEFAULT_ANIMATIONS.get(phase["pattern"], "")
 	if animation != "" and animation_player.has_animation(animation):
 		animation_player.play(animation)
 
 func _on_tick(step: int, bar: int) -> void:
-	if phase.is_empty() or not _can_run():
+	if phase.is_empty() or resting or not _can_run():
 		return
 	if get_tree().get_nodes_in_group("enemy_bullets").size() > bullet_cap:
 		return
@@ -216,11 +234,28 @@ func _run_pattern(pattern: int, step: int, bar: int) -> void:
 		Pattern.TWIN_VORTEX:
 			_twin_vortex(step)
 
+## Bullets come out of this node (e.g. a hand bone) instead of the entity origin.
+var _muzzle_cache: Dictionary = {}
+
+func _uses_alt() -> bool:
+	return alt_pattern >= 0 and not phase.is_empty() and phase.get("pattern") == alt_pattern
+
+func _origin() -> Vector2:
+	var muzzle_path := alt_muzzle_node if _uses_alt() and not alt_muzzle_node.is_empty() else muzzle_node
+	if not muzzle_path.is_empty():
+		var cached = _muzzle_cache.get(muzzle_path)
+		if cached == null or not is_instance_valid(cached):
+			cached = entity.get_node_or_null(muzzle_path) as Node2D
+			_muzzle_cache[muzzle_path] = cached
+		if cached != null:
+			return (cached as Node2D).global_position
+	return entity.global_position
+
 func _aim() -> Vector2:
 	var target := get_tree().get_first_node_in_group("player") as Node2D
 	if target == null:
 		return Vector2.LEFT
-	return (target.global_position - entity.global_position).normalized()
+	return (target.global_position - _origin()).normalized()
 
 func _tint(index: int) -> Color:
 	return palette[index % palette.size()]
@@ -232,9 +267,11 @@ func _fire(direction: Vector2, speed: float, tint: Color, dot_scale: float = 1.0
 			_muzzle_flash(m, entity.to_global(muzzle))
 			_fire(direction, speed, tint, dot_scale, entity.to_global(muzzle), wave_amplitude, wave_frequency, wave_phase)
 		return
+	if at == Vector2.INF and not muzzle_node.is_empty():
+		_muzzle_flash(0, _origin())
 	var bullet := BULLET_SCENE.instantiate() as Bullet
 	entity.get_parent().add_child(bullet)
-	bullet.global_position = entity.global_position if at == Vector2.INF else at
+	bullet.global_position = _origin() if at == Vector2.INF else at
 	bullet.direction = direction
 	bullet.speed = speed * speed_scale * Game.rank_bullet_speed_scale()
 	bullet.wave_amplitude = wave_amplitude
@@ -367,7 +404,7 @@ func _grid_lines(step: int) -> void:
 func _polygon_waves(step: int, bar: int) -> void:
 	if step != 0 and step != 8:
 		return
-	var center := entity.global_position
+	var center := _origin()
 	for layer in 2:
 		var sides := 3 + (bar + (step >> 3) + layer) % 4
 		var skip := 2 if (bar % 2 == 1 and sides >= 5) else 1
@@ -438,7 +475,7 @@ func _twin_vortex(step: int) -> void:
 	var arms := clampi(roundi(3.0 * _density()), 2, 5)
 	var angle := float(counter) * 0.22
 	var offset := 130.0
-	var centers := [entity.global_position + Vector2(0.0, -offset), entity.global_position + Vector2(0.0, offset)]
+	var centers := [_origin() + Vector2(0.0, -offset), _origin() + Vector2(0.0, offset)]
 	for c in 2:
 		var spin_dir := 1.0 if c == 0 else -1.0
 		var tint := _tint(c)

@@ -2770,7 +2770,7 @@ script = ExtResource("2_gaduk")
 
 [node name="HealthComponent" type="Node" parent="." unique_id=1358768132]
 script = ExtResource("3_uiabt")
-max_health = 1400
+max_health = 1200
 free_on_death = false
 
 [node name="HitFlashComponent" type="Node" parent="." unique_id=761239505]

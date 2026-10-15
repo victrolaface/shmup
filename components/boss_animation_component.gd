@@ -1,6 +1,9 @@
 class_name BossAnimationComponent
 extends Component
 
+## Emitted when the intro clip has played out, including its settle after the boss stops.
+signal intro_finished
+
 const ATTACK_ANIMATIONS := ["attack_homing_cone", "attack_horizontal_line", "attack_surround_stream"]
 const SHOOTER_ANIMATIONS := {
 	ShooterComponent.Mode.RADIAL: "attack_radial",
@@ -107,6 +110,7 @@ func _on_died() -> void:
 func _on_animation_finished(animation_name: StringName) -> void:
 	if animation_name == &"intro":
 		animation_player.speed_scale = 1.0
+		intro_finished.emit()
 	if animation_name == &"death" and not fall_on_death:
 		entity.queue_free()
 	elif not dying:

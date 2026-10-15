@@ -40,6 +40,7 @@ const SPIRAL_STEP := 0.45
 @export var ring_bullets: int = 18
 @export var bullet_tint: Color = Color(0, 0, 0, 0)
 @export var muzzle_offsets: PackedVector2Array = PackedVector2Array()
+@export var muzzle_node: NodePath
 @export var muzzle_flash_color: Color = Color(1.0, 0.6, 0.92, 0.9)
 @export var animation_name: String = ""
 @export var curtain_colors: PackedColorArray = PackedColorArray([Color(0.78, 0.05, 0.88, 1.0), Color(0.6, 0.05, 0.85, 1.0), Color(0.85, 0.05, 0.62, 1.0), Color(0.7, 0.05, 0.8, 1.0)])
@@ -141,7 +142,18 @@ func _aim_at_player() -> Vector2:
 	var player := get_tree().get_first_node_in_group("player") as Node2D
 	if player == null:
 		return Vector2.LEFT
-	return (player.global_position - entity.global_position).normalized()
+	return (player.global_position - _origin()).normalized()
+
+## Bullets come out of this node (e.g. a hand bone) instead of the entity origin.
+var _muzzle_cache: Node2D
+
+func _origin() -> Vector2:
+	if not muzzle_node.is_empty():
+		if _muzzle_cache == null or not is_instance_valid(_muzzle_cache):
+			_muzzle_cache = entity.get_node_or_null(muzzle_node) as Node2D
+		if _muzzle_cache != null:
+			return _muzzle_cache.global_position
+	return entity.global_position
 
 func _fire() -> void:
 	match mode:
@@ -223,9 +235,11 @@ func _spawn_bullet(direction: Vector2, amplitude: float = 0.0, frequency: float 
 			_muzzle_flash(m, entity.to_global(muzzle))
 			_spawn_bullet(direction, amplitude, frequency, phase, tint, dot_scale, entity.to_global(muzzle))
 		return
+	if at == Vector2.INF and not muzzle_node.is_empty():
+		_muzzle_flash(0, _origin())
 	var bullet := bullet_scene.instantiate() as Bullet
 	entity.get_parent().add_child(bullet)
-	bullet.global_position = entity.global_position if at == Vector2.INF else at
+	bullet.global_position = _origin() if at == Vector2.INF else at
 	bullet.direction = direction
 	bullet.speed = bullet_speed * Game.rank_bullet_speed_scale()
 	bullet.wave_amplitude = amplitude

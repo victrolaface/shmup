@@ -18,6 +18,18 @@ const HEART_SPACING := 58.0
 const HEART_FULL := Color(1, 0.25, 0.35, 1)
 const HEART_EMPTY := Color(0.25, 0.2, 0.25, 1)
 const SHOP_DELAY := 6.5
+const SHOP_SCENE := preload("res://shop/shop.tscn")
+## The shopkeeper slides in from beyond the bottom-right corner and settles there.
+const SHOP_START := Vector2(3600, 2100)
+const SHOP_REST := Vector2(1796, 976)
+const SHOP_ENTER_TIME := 2.2
+const SHOP_EXIT_TIME := 1.6
+const SHOP_LAND_TIME := 1.1
+const SHOP_HOP_TIME := 0.8
+const SHOP_HOP_HEIGHT := 170.0
+const SHOP_SHAKE_AMOUNT := 16.0
+const SHOP_SHAKE_STEPS := 8
+const SHOP_SHAKE_STEP_TIME := 0.05
 const UPGRADE_COST := 10
 const MAX_SHOP_PURCHASES := 1
 const COMBO_BAR_WIDTH := 240.0
@@ -63,6 +75,8 @@ const COMBO_BAR_WIDTH := 240.0
 var is_paused: bool = false
 var is_game_over: bool = false
 var shop_open: bool = false
+var shop_node: Node2D
+var shop_leaving: bool = false
 var boss_active: bool = false
 var shop_offers: Array[String] = []
 var shop_purchases: int = 0
@@ -223,15 +237,29 @@ func _show_stage_clear() -> void:
 
 func _open_shop() -> void:
 	shop_open = true
-	get_tree().paused = true
+	shop_leaving = false
 	shop_offers = player.upgrades.roll_offers(shop_option_buttons.size())
 	shop_purchases = 0
 	shop_result_label.text = ""
 	_refresh_shop()
+	player.set_controls_enabled(false)
+
+	shop_node = SHOP_SCENE.instantiate()
+	entities.add_child(shop_node)
+	shop_node.position = SHOP_START
+	var enter := create_tween()
+	enter.tween_property(shop_node, "position", SHOP_REST, SHOP_ENTER_TIME).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	await enter.finished
+
+	# The player drifts down onto the shopkeeper's stomach, then the HUD offers the upgrades.
+	var landing := shop_node.get_node("Landing") as Node2D
+	await _glide_player_to(landing.global_position, SHOP_LAND_TIME).finished
+	if is_game_over:
+		return
 	shop_menu.visible = true
 
 func _refresh_shop() -> void:
-	shop_coins_label.text = "COINS: %d    PURCHASES LEFT: %d" % [Game.currency, MAX_SHOP_PURCHASES - shop_purchases]
+	shop_coins_label.text = "COINS: %d" % Game.currency
 	var purchases_left := shop_purchases < MAX_SHOP_PURCHASES
 	for i in shop_option_buttons.size():
 		var button := shop_option_buttons[i]
@@ -247,19 +275,61 @@ func _refresh_shop() -> void:
 			button.text = "%s  (MAXED)" % upgrade_name
 			button.disabled = true
 
+## Landing on the shopkeeper and hopping off share one easing: a slow start, a quicker middle
+## and a soft stop.
+func _glide_player_to(target: Vector2, time: float) -> Tween:
+	var glide := create_tween()
+	glide.tween_property(player, "global_position", target, time).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	return glide
+
 func _on_shop_option_pressed(index: int) -> void:
 	var id := shop_offers[index]
 	if shop_purchases >= MAX_SHOP_PURCHASES or not player.upgrades.can_upgrade(id) or not Game.spend_currency(UPGRADE_COST):
 		return
 	shop_purchases += 1
 	shop_result_label.text = "GOT: " + player.upgrades.apply_upgrade(id)
-	_refresh_shop()
+	_leave_shop(true)
 
 func _on_shop_continue_pressed() -> void:
-	shop_open = false
+	_leave_shop()
+
+## Picking an upgrade (or leaving) hands control straight back: the player hops off the
+## shopkeeper, the shopkeeper slides away, and the next level starts.
+func _leave_shop(shake: bool = false) -> void:
+	if shop_node == null or shop_leaving or not shop_menu.visible:
+		return
+	shop_leaving = true
 	shop_menu.visible = false
-	get_tree().paused = is_paused
+	if shake:
+		await _shake_shop()
+	var hop := _glide_player_to(player.global_position + Vector2(0.0, -SHOP_HOP_HEIGHT), SHOP_HOP_TIME)
+	var leaving := shop_node
+	var exit := create_tween()
+	exit.tween_property(leaving, "position", SHOP_START, SHOP_EXIT_TIME).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	await hop.finished
+	player.set_controls_enabled(true)
+	shop_open = false
+	shop_node = null
 	_start_next_level()
+	await exit.finished
+	leaving.queue_free()
+
+## A purchase makes the shopkeeper judder for a moment; the player rides along on his belly.
+func _shake_shop() -> void:
+	var shop_rest := shop_node.position
+	var player_rest := player.global_position
+	var shake := create_tween()
+	for i in SHOP_SHAKE_STEPS:
+		var strength := SHOP_SHAKE_AMOUNT * (1.0 - float(i) / float(SHOP_SHAKE_STEPS))
+		var offset := Vector2(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0)) * strength
+		shake.tween_callback(func() -> void:
+			shop_node.position = shop_rest + offset
+			player.global_position = player_rest + offset)
+		shake.tween_interval(SHOP_SHAKE_STEP_TIME)
+	shake.tween_callback(func() -> void:
+		shop_node.position = shop_rest
+		player.global_position = player_rest)
+	await shake.finished
 
 func _start_next_level() -> void:
 	boss_active = false
